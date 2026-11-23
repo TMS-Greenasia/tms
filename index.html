@@ -1,0 +1,3035 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Greenasia TMS v4.1 – PT. Greenasia Tunas Raya</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap">
+  <style>
+    /* =========================================================================
+       VARIABEL TEMA & ADAPTASI LIGHT/DARK MODE
+       ========================================================================= */
+    :root {
+      --bg: #eceae4;
+      --sf: #fbfaf7;
+      --tx: #1d2428;
+      --mu: #667178;
+      --ln: #d5d2c8;
+      --ac: #0e5a5a;
+      --ac2: #e8820c;
+      --ok: #2f7d3e;
+      --bad: #b3392b;
+      --hd: #17262b;
+      --hdt: #f1efe8;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #12181b;
+        --sf: #1a2226;
+        --tx: #e8e6df;
+        --mu: #8d989e;
+        --ln: #2d3a40;
+        --ac: #4fb3ae;
+        --ac2: #f09a35;
+        --ok: #6cc27c;
+        --bad: #ef7a6b;
+        --hd: #0b1113;
+        --hdt: #e8e6df;
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #12181b;
+      --sf: #1a2226;
+      --tx: #e8e6df;
+      --mu: #8d989e;
+      --ln: #2d3a40;
+      --ac: #4fb3ae;
+      --ac2: #f09a35;
+      --ok: #6cc27c;
+      --bad: #ef7a6b;
+      --hd: #0b1113;
+      --hdt: #e8e6df;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--tx);
+      font: 15px/1.45 Barlow, system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* =========================================================================
+       HEADER & NAVIGASI UTAMA
+       ========================================================================= */
+    header {
+      background: var(--hd);
+      color: var(--hdt);
+      padding: 10px 16px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .brand-box { display: flex; flex-direction: column; }
+    h1 {
+      font: 700 22px 'Barlow Condensed', sans-serif;
+      letter-spacing: .02em;
+      margin: 0;
+      line-height: 1.05;
+    }
+    .brand-sub { font-size: 11px; opacity: .75; }
+
+    nav { display: flex; gap: 2px; flex-wrap: wrap; }
+    nav button {
+      background: none;
+      border: 0;
+      color: var(--hdt);
+      opacity: .72;
+      padding: 7px 10px;
+      font: 600 13.5px Barlow, sans-serif;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      border-radius: 4px 4px 0 0;
+    }
+    nav button:hover { opacity: .95; }
+    nav button.on { opacity: 1; border-color: var(--ac2); background: rgba(255,255,255,.06); }
+
+    .who {
+      margin-left: auto;
+      font-size: 13px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .bell {
+      background: var(--ac2);
+      color: #1b1206;
+      border-radius: 10px;
+      padding: 2px 9px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .bell.bad { background: var(--bad); color: #fff; }
+    .wib-clock {
+      font-variant-numeric: tabular-nums;
+      background: rgba(255,255,255,.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    /* =========================================================================
+       KARTU, STATISTIK, TABEL, FORM & TOMBOL
+       ========================================================================= */
+    main { max-width: 1240px; margin: 0 auto; padding: 16px; width: 100%; }
+    .card {
+      background: var(--sf);
+      border: 1px solid var(--ln);
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    h2 { font: 700 21px 'Barlow Condensed', sans-serif; margin: 0 0 10px; }
+    h3 { font: 600 15px Barlow, sans-serif; margin: 14px 0 6px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+
+    .stat {
+      flex: 1;
+      min-width: 150px;
+      border-left: 4px solid var(--ac);
+      padding: 4px 12px;
+      background: var(--bg);
+      border-radius: 0 4px 4px 0;
+    }
+    .stat b { display: block; font: 700 22px 'Barlow Condensed', sans-serif; font-variant-numeric: tabular-nums; }
+    .stat span { color: var(--mu); font-size: 12.5px; }
+    .stat.warn { border-left-color: var(--ac2); }
+    .stat.bad { border-left-color: var(--bad); }
+    .stat.ok { border-left-color: var(--ok); }
+
+    .tw { overflow-x: auto; width: 100%; }
+    table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+    th {
+      text-align: left;
+      color: var(--mu);
+      font-weight: 600;
+      border-bottom: 2px solid var(--ln);
+      padding: 7px 8px;
+      white-space: nowrap;
+    }
+    td { border-bottom: 1px solid var(--ln); padding: 7px 8px; vertical-align: middle; }
+    td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+
+    label { display: flex; flex-direction: column; font-size: 13px; color: var(--mu); gap: 3px; flex: 1; min-width: 140px; }
+    input, select, textarea {
+      font: inherit;
+      color: var(--tx);
+      background: var(--bg);
+      border: 1px solid var(--ln);
+      border-radius: 4px;
+      padding: 7px 8px;
+      width: 100%;
+    }
+    td input { padding: 4px 6px; }
+    :focus-visible { outline: 2px solid var(--ac2); outline-offset: 1px; }
+
+    .b {
+      font: 600 13.5px Barlow, sans-serif;
+      border: 1px solid var(--ac);
+      background: var(--ac);
+      color: #fff;
+      border-radius: 4px;
+      padding: 7px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      text-decoration: none;
+    }
+    .b.g { background: none; color: var(--ac); }
+    .b.o { background: var(--ac2); border-color: var(--ac2); color: #1b1206; }
+    .b.s { padding: 4px 8px; font-size: 12.5px; }
+    .b.r { background: none; border-color: var(--bad); color: var(--bad); }
+    header .b.g { color: var(--hdt); border-color: rgba(255,255,255,.35); }
+
+    .tag {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--ln);
+      color: var(--tx);
+    }
+    .st-Booking { background: #d9dde0; color: #2a3338; }
+    .st-Dispatch { background: #c8dff0; color: #0f3d5f; }
+    .st-Selesai { background: #d9d0ef; color: #3a2670; }
+    .st-Ditagih { background: #2f7d3e; color: #fff; }
+    .st-Batal { background: #b3392b; color: #fff; }
+    .jn-Import { background: #d4e8f7; color: #0b426e; }
+    .jn-Export { background: #fde2c4; color: #6e3604; }
+    .jn-Repo { background: #e4d9f7; color: #3f1d75; }
+
+    .pipe { display: flex; gap: 6px; margin: 10px 0 14px; flex-wrap: wrap; }
+    .pipe span {
+      flex: 1;
+      min-width: 90px;
+      text-align: center;
+      font-size: 12px;
+      padding: 6px;
+      border-bottom: 4px solid var(--ln);
+      color: var(--mu);
+    }
+    .pipe .d { border-color: var(--ac); color: var(--tx); }
+    .pipe .c { border-color: var(--ac2); color: var(--tx); font-weight: 700; }
+
+    /* =========================================================================
+       MODAL, TOAST, FLEET CARDS & DRIVER WORKFLOW
+       ========================================================================= */
+    #mw {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      display: none;
+      overflow: auto;
+      padding: 14px;
+      z-index: 30;
+    }
+    #mw.on { display: block; }
+    #md {
+      background: var(--sf);
+      max-width: 940px;
+      margin: 0 auto;
+      border-radius: 6px;
+      padding: 18px;
+      border: 1px solid var(--ln);
+    }
+
+    .tot { margin-left: auto; max-width: 350px; width: 100%; }
+    .tot div { display: flex; justify-content: space-between; padding: 3px 0; }
+    .tot .g { border-top: 2px solid var(--tx); font-weight: 700; font-size: 17px; margin-top: 4px; padding-top: 6px; }
+    .hint { color: var(--mu); font-size: 12.5px; }
+    .ok { color: var(--ok); }
+    .bad { color: var(--bad); }
+
+    .tile {
+      border: 1px solid var(--ln);
+      border-left: 5px solid var(--ac2);
+      border-radius: 5px;
+      padding: 10px 12px;
+      flex: 1;
+      min-width: 220px;
+      background: var(--bg);
+    }
+    .tile.t2 { border-left-color: var(--ac); }
+    .tile b { display: block; margin-bottom: 4px; }
+
+    .dc {
+      border: 1px solid var(--ln);
+      border-radius: 6px;
+      padding: 14px;
+      margin-bottom: 12px;
+      background: var(--sf);
+    }
+    .dc.new { border-color: var(--ac2); border-width: 2px; }
+    .dc.locked { opacity: .75; background: var(--bg); }
+    .dc.wizard { border-color: var(--ac); border-width: 2px; }
+
+    .login { max-width: 390px; margin: 10vh auto; padding: 0 16px; }
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      background: var(--ac2);
+      color: #1b1206;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      display: none;
+      z-index: 50;
+      box-shadow: 0 4px 16px rgba(0,0,0,.25);
+    }
+
+    .route-box {
+      background: var(--bg);
+      border: 1px solid var(--ln);
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-top: 10px;
+    }
+    .route-flow { font-size: 13px; font-weight: 600; color: var(--ac); margin-bottom: 6px; }
+
+    .pbox {
+      border: 1px dashed var(--ln);
+      border-radius: 6px;
+      padding: 10px;
+      background: var(--bg);
+      flex: 1;
+      min-width: 210px;
+    }
+    .pbox img {
+      max-width: 100%;
+      max-height: 170px;
+      border-radius: 4px;
+      margin-top: 8px;
+      display: block;
+      border: 1px solid var(--ln);
+      cursor: zoom-in;
+    }
+    .pgrid { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+    .pitem {
+      border: 1px solid var(--ln);
+      border-radius: 6px;
+      padding: 8px;
+      background: var(--bg);
+      max-width: 240px;
+    }
+    .pitem img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 4px;
+      cursor: zoom-in;
+      display: block;
+      margin-top: 4px;
+    }
+
+    .drv-rep {
+      border: 1px solid var(--ln);
+      border-left: 5px solid var(--ac);
+      background: var(--bg);
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin: 10px 0;
+    }
+    .drv-rep.warn { border-left-color: var(--bad); }
+
+    .step-bar { display: flex; gap: 6px; margin: 10px 0 14px; flex-wrap: wrap; }
+    .step-bar div {
+      flex: 1;
+      min-width: 130px;
+      padding: 7px 10px;
+      border-radius: 5px;
+      border: 1px solid var(--ln);
+      background: var(--bg);
+      font-size: 12.5px;
+      color: var(--mu);
+    }
+    .step-bar div.done { border-color: var(--ok); color: var(--ok); font-weight: 600; }
+    .step-bar div.act { border-color: var(--ac2); background: rgba(232,130,12,.12); color: var(--tx); font-weight: 700; }
+
+    .fleet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 8px; }
+    .f-card {
+      border: 1px solid var(--ln);
+      border-radius: 6px;
+      padding: 10px 12px;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .f-card.active { border-left: 5px solid var(--ac2); }
+    .f-card.standby { border-left: 5px solid var(--ok); }
+    .f-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .f-meta { font-size: 12px; color: var(--mu); line-height: 1.4; }
+    .doc-box {
+      border: 1px solid var(--ln);
+      border-left: 4px solid var(--ac);
+      background: var(--bg);
+      border-radius: 5px;
+      padding: 9px 12px;
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* =========================================================================
+       KOP SURAT & INVOICE A4 (PRESISI MARGIN KERTAS A4)
+       ========================================================================= */
+    .kop-box {
+      border-bottom: 2px solid #2d573e;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      text-align: right;
+      font-family: Arial, sans-serif;
+      color: #111;
+    }
+    .kop-co {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-weight: 700;
+      font-size: 19px;
+      color: #27533b;
+      letter-spacing: .3px;
+      margin-bottom: 2px;
+    }
+    .kop-addr { font-size: 10.5px; line-height: 1.4; color: #222; }
+
+    .a4-inv {
+      width: 100%;
+      max-width: 186mm;
+      margin: 0 auto;
+      background: #fff;
+      color: #111;
+      padding: 6mm 8mm;
+      border: 1px solid #d0d5dd;
+      font-family: Arial, sans-serif;
+      font-size: 11px;
+    }
+    .a4-top-meta { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+    .a4-title { font-size: 20px; font-weight: 700; letter-spacing: 1px; color: #1b3b2b; margin: 0; }
+    .a4-order-no { font-size: 11px; font-weight: 700; color: #333; margin-top: 2px; }
+    .a4-info-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 10px; margin-bottom: 10px; }
+    .a4-box { border: 1px solid #cbd5e1; border-radius: 3px; padding: 7px 9px; background: #fcfdfb; }
+    .a4-box-title {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #27533b;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 3px;
+      margin-bottom: 5px;
+    }
+    .a4-kv { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+    .a4-kv td { padding: 1.5px 2px; border: 0; vertical-align: top; }
+    .a4-kv td.lbl { width: 92px; color: #475569; font-weight: 600; }
+    .a4-kv td.sep { width: 8px; }
+    .a4-kv td.val { color: #0f172a; font-weight: 600; word-break: break-word; }
+
+    .a4-items {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10px;
+      table-layout: fixed;
+      margin-bottom: 10px;
+    }
+    .a4-items th {
+      background: #27533b;
+      color: #fff;
+      font-weight: 700;
+      padding: 5px 4px;
+      border: 1px solid #27533b;
+      text-align: left;
+      white-space: normal;
+      word-break: break-word;
+    }
+    .a4-items td {
+      padding: 5px 4px;
+      border: 1px solid #cbd5e1;
+      color: #111;
+      vertical-align: top;
+      word-break: break-word;
+    }
+    .a4-items th.n, .a4-items td.n { text-align: right; font-variant-numeric: tabular-nums; }
+    .a4-items th.c, .a4-items td.c { text-align: center; }
+    .a4-grand-row td { background: #eef6f1; font-weight: 700; font-size: 11px; color: #143624; border-top: 2px solid #27533b; }
+
+    .a4-terbilang {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-left: 4px solid #27533b;
+      padding: 5px 8px;
+      font-size: 10.5px;
+      margin-bottom: 10px;
+    }
+    .a4-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; margin-top: 8px; flex-wrap: wrap; }
+    .a4-pay { border: 1px solid #cbd5e1; border-radius: 3px; padding: 7px 10px; background: #fcfdfb; font-size: 10.5px; min-width: 240px; }
+    .a4-pay b.hd-pay { display: block; color: #27533b; font-size: 10px; margin-bottom: 4px; text-transform: uppercase; }
+    .a4-sign { text-align: center; min-width: 170px; font-size: 10.5px; }
+    .a4-sign-space { height: 48px; }
+    .a4-sign-line { border-top: 1px solid #334155; padding-top: 3px; font-weight: 700; }
+    .a4-foot {
+      margin-top: 10px;
+      padding-top: 5px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 9.5px;
+      color: #64748b;
+    }
+
+    @page { size: A4 portrait; margin: 10mm; }
+    @media print {
+      body * { visibility: hidden; }
+      #mw, #mw * { visibility: visible; }
+      #mw { position: static; background: none; padding: 0; overflow: visible; }
+      #md { max-width: none; width: 100%; margin: 0; padding: 0; border: 0; box-shadow: none; background: #fff; }
+      .a4-inv { max-width: 100%; width: 100%; padding: 0; border: 0; }
+      .np { display: none !important; }
+      :root { --sf: #fff; --tx: #000; --bg: #fff; --mu: #444; --ln: #bbb; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"><main><p>Memuat aplikasi Greenasia TMS v4.1…</p></main></div>
+  <div id="mw"><div id="md"></div></div>
+  <div id="toast"></div>
+
+  <script>
+    /* =========================================================================
+       KONSTANTA MASTER, FORMAT WAKTU WIB & HELPER UTILITAS
+       ========================================================================= */
+    const TIPE = ['Trailer 20ft', 'Trailer 40ft', 'Flatbed', 'Lowbed'];
+    const ST = ['Booking', 'Dispatch', 'Selesai', 'Ditagih'];
+    const CO = {
+      n: 'PT. GREENASIA TUNAS RAYA',
+      a: 'JL.KEBON BAWANG VII NO.73, Desa/Kelurahan Kebon Bawang, Kec. Tanjung Priok, Kota Adm. Jakarta Utara, Provinsi DKI Jakarta, Kode Pos: 14320',
+      web: 'www.greenasia.co.id',
+      email: 'finance@greenasia.co.id',
+      bank: 'BCA',
+      norek: '6910778143',
+      an: 'PT. GREENASIA TUNAS RAYA',
+      finance: 'ENI'
+    };
+
+    const KOP_HTML = `<div class="kop-box">
+      <div class="kop-co">${CO.n}</div>
+      <div class="kop-addr">
+        JL.KEBON BAWANG VII NO.73, Desa/Kelurahan Kebon Bawang,<br>
+        Kec. Tanjung Priok, Kota Adm. Jakarta Utara, Provinsi DKI Jakarta,<br>
+        Kode Pos: 14320 web: ${CO.web} Email: ${CO.email}
+      </div>
+    </div>`;
+
+    const R = n => 'Rp ' + Math.round(+n || 0).toLocaleString('id-ID');
+    const Rplain = n => 'Rp. ' + Math.round(+n || 0).toLocaleString('en-US');
+    const E = s => String(s ?? '').replace(/[&<>'"]/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[c]));
+    const $ = id => document.getElementById(id);
+
+    const getWibParts = (dt = new Date()) => {
+      const s = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Jakarta',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false
+      }).format(dt);
+      const [dPart, tPart] = s.split(', ');
+      const [dd, mm, yyyy] = dPart.split('/');
+      return {
+        iso: `${yyyy}-${mm}-${dd}`,
+        dmy: `${dd}/${mm}/${yyyy}`,
+        time: tPart,
+        full: `${dd}/${mm}/${yyyy} ${tPart} WIB`
+      };
+    };
+
+    const today = () => getWibParts().iso;
+    const nowWib = () => getWibParts().full;
+    const addDays = (dStr, days) => {
+      const [y, m, d] = dStr.split('-').map(Number);
+      const dt = new Date(Date.UTC(y, m - 1, d + days, 12, 0, 0));
+      return getWibParts(dt).iso;
+    };
+    const diffDays = targetStr => {
+      if (!targetStr) return 999;
+      const [y1, m1, d1] = today().split('-').map(Number);
+      const [y2, m2, d2] = targetStr.split('-').map(Number);
+      return Math.round((Date.UTC(y2, m2 - 1, d2) - Date.UTC(y1, m1 - 1, d1)) / 86400000);
+    };
+
+    const parseWibToDate = wibStr => {
+      if (!wibStr) return null;
+      const m = String(wibStr).match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2}):(\d{2})/);
+      if (!m) return null;
+      return new Date(`${m[3]}-${m[2]}-${m[1]}T${m[4]}:${m[5]}:${m[6]}+07:00`);
+    };
+
+    const fmtElapsed = wibStr => {
+      const start = parseWibToDate(wibStr);
+      if (!start || isNaN(start.getTime())) return 'Sedang berjalan';
+      const diffMin = Math.max(1, Math.round((Date.now() - start.getTime()) / 60000));
+      const jam = Math.floor(diffMin / 60);
+      const mnt = diffMin % 60;
+      return jam > 0 ? `${jam} jam ${mnt} mnt` : `${mnt} menit`;
+    };
+
+    const estEndWib = (wibStr, jenis) => {
+      const base = parseWibToDate(wibStr) || new Date();
+      const addMin = jenis === 'Repo' ? 150 : 270;
+      const est = new Date(base.getTime() + addMin * 60000);
+      return getWibParts(est).time + ' WIB';
+    };
+
+    const cl = x => JSON.parse(JSON.stringify(x));
+    function sha256Fallback(ascii) {
+      const rightRotate = (v, a) => (v >>> a) | (v << (32 - a));
+      const maxWord = Math.pow(2, 32), words = [];
+      let result = '', asciiBitLength = ascii.length * 8;
+      let hash = sha256Fallback.h = sha256Fallback.h || [];
+      let k = sha256Fallback.k = sha256Fallback.k || [];
+      let primeCounter = k.length, isComposite = {};
+      for (let candidate = 2; primeCounter < 64; candidate++) {
+        if (!isComposite[candidate]) {
+          for (let i = 0; i < 313; i += candidate) isComposite[i] = candidate;
+          hash[primeCounter] = (Math.pow(candidate, .5) * maxWord) | 0;
+          k[primeCounter++] = (Math.pow(candidate, 1 / 3) * maxWord) | 0;
+        }
+      }
+      ascii += '\x80';
+      while (ascii.length % 64 - 56) ascii += '\x00';
+      for (let i = 0; i < ascii.length; i++) {
+        const j = ascii.charCodeAt(i);
+        words[i >> 2] |= j << ((3 - i) % 4) * 8;
+      }
+      words[words.length] = ((asciiBitLength / maxWord) | 0);
+      words[words.length] = (asciiBitLength);
+      let h = hash.slice(0, 8);
+      for (let j = 0; j < words.length;) {
+        const w = words.slice(j, j += 16), oldHash = h.slice(0);
+        for (let i = 0; i < 64; i++) {
+          const w15 = w[i - 15], w2 = w[i - 2];
+          const a = h[0], e = h[4];
+          const temp1 = h[7]
+            + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
+            + ((e & h[5]) ^ ((~e) & h[6])) + k[i]
+            + (w[i] = (i < 16) ? w[i] : (
+              w[i - 16] + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
+              + w[i - 7] + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
+            ) | 0);
+          const temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
+            + ((a & h[1]) ^ (a & h[2]) ^ (h[1] & h[2]));
+          h = [(temp1 + temp2) | 0].concat(h);
+          h[4] = (h[4] + temp1) | 0;
+          h.pop();
+        }
+        for (let i = 0; i < 8; i++) h[i] = (h[i] + oldHash[i]) | 0;
+      }
+      for (let i = 0; i < 8; i++) {
+        for (let j = 3; j + 1; j--) {
+          const b = (h[i] >> (j * 8)) & 255;
+          result += ((b < 16) ? 0 : '') + b.toString(16);
+        }
+      }
+      return result;
+    }
+
+    const H = async s => {
+      const str = 'gtr|' + s;
+      if (window.crypto && window.crypto.subtle) {
+        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+        return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+      return sha256Fallback(unescape(encodeURIComponent(str)));
+    };
+
+    /* =========================================================================
+       STATE APLIKASI & PENYIMPANAN DATA
+       ========================================================================= */
+    let M = null, O = {}, V = {}, me = null, view = 'dash', lastBell = 0;
+    let fSearch = '', fStatus = 'ALL', fJenis = 'ALL';
+    let tmpPhotos = { pod: '', seal: '' };
+    let tmpBkDoc = null, tmpUplDoc = null;
+    let bkPreselect = { drv: '', trk: '' };
+    let apiToken = '';
+    let useBackend = false;
+    const API_ENDPOINT = './api.php';
+    const LSK = 'tms_gtr_v41';
+
+    function getApiToken() {
+      if (apiToken) return apiToken;
+      try { apiToken = sessionStorage.getItem('tms_api_token') || ''; } catch (e) {}
+      return apiToken;
+    }
+
+    function setApiToken(tok) {
+      apiToken = tok || '';
+      try {
+        if (apiToken) sessionStorage.setItem('tms_api_token', apiToken);
+        else sessionStorage.removeItem('tms_api_token');
+      } catch (e) {}
+    }
+
+    async function apiReq(url, opts = {}) {
+      let action = '';
+      let payload = opts.body ? JSON.parse(opts.body) : {};
+      let method = 'POST';
+
+      if (url === '/api/health') { action = 'health'; method = 'GET'; }
+      else if (url === '/api/auth/login') { action = 'login'; }
+      else if (url === '/api/auth/logout') { action = 'logout'; }
+      else if (url === '/api/bootstrap') { action = 'bootstrap'; method = 'GET'; }
+      else if (url === '/api/master') { action = 'saveMaster'; }
+      else if (url.startsWith('/api/orders/') && (opts.method || 'PUT') === 'PUT') {
+        action = 'saveOrder';
+        payload = { ...payload, spk: decodeURIComponent(url.replace('/api/orders/', '')) };
+      } else if (url.startsWith('/api/orders/') && opts.method === 'DELETE') {
+        action = 'deleteOrder';
+        payload = { spk: decodeURIComponent(url.replace('/api/orders/', '')) };
+      } else if (url.startsWith('/api/invoices/')) {
+        action = 'saveInvoice';
+        payload = { ...payload, id: decodeURIComponent(url.replace('/api/invoices/', '')) };
+      }
+
+      const tok = getApiToken();
+      const headers = { 'Content-Type': 'application/json' };
+      if (tok) {
+        headers['Authorization'] = 'Bearer ' + tok;
+        headers['X-Api-Token'] = tok;
+      }
+
+      const fetchUrl = `${API_ENDPOINT}?action=${encodeURIComponent(action)}${method === 'GET' ? '&_t=' + Date.now() : ''}`;
+      const fetchOpts = { method, headers, cache: 'no-store' };
+      if (method === 'POST') fetchOpts.body = JSON.stringify(payload);
+
+      const res = await fetch(fetchUrl, fetchOpts);
+      const rawText = await res.text();
+      let data = {};
+      try {
+        data = rawText ? JSON.parse(rawText) : {};
+      } catch (e) {
+        throw new Error('Respons server bukan JSON valid.');
+      }
+      if (!res.ok || data.ok === false) {
+        throw new Error(data.error || `HTTP ${res.status}`);
+      }
+      return data;
+    }
+
+    async function syncNow() {
+      if (!useBackend || !getApiToken()) return;
+      try {
+        const bootData = await apiReq('/api/bootstrap');
+        M = bootData.master;
+        O = bootData.orders || {};
+        V = bootData.invoices || {};
+        lsSave();
+        rr();
+        showToast('Data berhasil disinkronkan dari server.');
+      } catch (e) {
+        showToast('Gagal sinkronisasi: ' + e.message);
+      }
+    }
+
+    function showToast(msg) {
+      const x = $('toast');
+      if (!x) return;
+      x.textContent = msg;
+      x.style.display = 'block';
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => { x.style.display = 'none'; }, 3800);
+    }
+
+    function lsSave() {
+      try {
+        localStorage.setItem(LSK, JSON.stringify({ M, O, V }));
+      } catch (e) {
+        showToast('Penyimpanan lokal penuh.');
+      }
+    }
+
+    const pm = () => {
+      lsSave();
+      if (useBackend && getApiToken()) {
+        apiReq('/api/master', { method: 'PUT', body: JSON.stringify(M) }).catch(e => showToast('Sync backend: ' + e.message));
+      }
+    };
+    const po = o => {
+      O[o.spk] = o;
+      lsSave();
+      if (useBackend && getApiToken()) {
+        apiReq('/api/orders/' + encodeURIComponent(o.spk), { method: 'PUT', body: JSON.stringify(o) }).catch(e => showToast('Sync order: ' + e.message));
+      }
+    };
+    const pv = v => {
+      V[v.id] = v;
+      lsSave();
+      if (useBackend && getApiToken()) {
+        apiReq('/api/invoices/' + encodeURIComponent(v.id), { method: 'PUT', body: JSON.stringify(v) }).catch(e => showToast('Sync invoice: ' + ((e && e.message) || String(e) || 'Gagal')));
+      }
+    };
+
+    function compressImg(file, maxW = 800, q = 0.7) {
+      return new Promise((resolve, reject) => {
+        if (!file) return resolve('');
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = new Image();
+          img.onload = () => {
+            let w = img.width, h = img.height;
+            if (w > maxW) { h = Math.round(h * (maxW / w)); w = maxW; }
+            const cv = document.createElement('canvas');
+            cv.width = w; cv.height = h;
+            cv.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(cv.toDataURL('image/jpeg', q));
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function readAttachedFile(file) {
+      return new Promise((resolve, reject) => {
+        if (!file) return resolve(null);
+        const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+        if (isPdf) {
+          if (file.size > 4 * 1024 * 1024) return reject(new Error('Ukuran PDF maksimal 4 MB.'));
+          const reader = new FileReader();
+          reader.onload = e => resolve({
+            name: file.name,
+            mime: 'application/pdf',
+            kind: 'pdf',
+            sizeKb: Math.round(file.size / 1024),
+            dataUrl: e.target.result,
+            uploadedAt: nowWib()
+          });
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        } else {
+          compressImg(file, 900, 0.75).then(dataUrl => resolve({
+            name: file.name,
+            mime: 'image/jpeg',
+            kind: 'image',
+            sizeKb: Math.round((dataUrl.length * 0.75) / 1024),
+            dataUrl,
+            uploadedAt: nowWib()
+          })).catch(reject);
+        }
+      });
+    }
+
+    const fmtRute = o => {
+      const j = o.jenis || 'Import';
+      const term = o.term || o.a || '-';
+      const tujuan = o.t || '-';
+      const depo = o.depo || '-';
+      if (j === 'Export') return `${depo} → ${tujuan} → ${term}`;
+      if (j === 'Repo') return (o.repoDir || 'T2D') === 'D2T' ? `${depo} → ${term}` : `${term} → ${depo}`;
+      return `${term} → ${tujuan} → ${depo}`;
+    };
+    const jClass = j => j === 'Repo' ? 'jn-Repo' : j === 'Export' ? 'jn-Export' : 'jn-Import';
+    const jLabel = j => j === 'Repo' ? 'Repo Container' : (j || 'Import');
+
+    const fmtSrcOrder = o => {
+      const s = o.srcOrder || {};
+      const parts = [s.perusahaan, s.nama, s.telp].filter(Boolean);
+      return parts.length ? parts.join(' · ') : '-';
+    };
+
+    /* =========================================================================
+       DATA AWAL (SEED)
+       ========================================================================= */
+    async function seed() {
+      const a = await H('admin123');
+      const s = await H('super123');
+      const k = await H('kasir123');
+      const d = await H('driver123');
+      const P = 'Terminal JICT, Tanjung Priok';
+      const D = 'Depo Marunda Empty';
+      const td = today();
+      const ts = nowWib();
+      return {
+        routes: [
+          { jenis: 'Import', term: P, t: 'Kawasan Industri Cikarang', depo: D, c: [2800000, 3600000, 0, 0], u: [900000, 1100000, 0, 0] },
+          { jenis: 'Export', term: P, t: 'Kawasan Industri Cikarang', depo: D, c: [2700000, 3500000, 0, 0], u: [850000, 1050000, 0, 0] },
+          { jenis: 'Repo', repoDir: 'T2D', term: P, t: 'Repo Container', depo: D, c: [950000, 1200000, 0, 0], u: [300000, 350000, 0, 0] },
+          { jenis: 'Repo', repoDir: 'D2T', term: P, t: 'Repo Container', depo: D, c: [950000, 1200000, 0, 0], u: [300000, 350000, 0, 0] }
+        ],
+        custs: ['PT. Maju Jaya Logistik', 'CV. Sumber Makmur'],
+        custList: [
+          { n: 'PT. Maju Jaya Logistik', al: 'Kawasan Industri Jababeka Tahap II Blok FF, Cikarang' },
+          { n: 'CV. Sumber Makmur', al: 'Jl. Raya Narogong KM 18, Cileungsi, Bogor' }
+        ],
+        drivers: [
+          { id: 'D1', n: 'Slamet Riyadi', hp: '0812-3300-111', plat: 'B 9123 UA', us: 'slamet', pw: d },
+          { id: 'D2', n: 'Budi Santoso', hp: '0813-5500-222', plat: 'B 9456 UB', us: 'budi', pw: d },
+          { id: 'D3', n: 'Agus Wijaya', hp: '0857-1100-333', plat: 'B 8821 UC', us: 'agus', pw: d }
+        ],
+        trucks: [
+          { plat: 'B 9123 UA', jenis: 'Head + Trailer 40ft', stnk: 'STNK-9123-JKT', pajakDue: addDays(td, 140), stnkDue: addDays(td, 800) },
+          { plat: 'B 9456 UB', jenis: 'Head + Trailer 20ft', stnk: 'STNK-9456-JKT', pajakDue: addDays(td, 12), stnkDue: addDays(td, 420) },
+          { plat: 'B 8821 UC', jenis: 'Head + Trailer 40ft', stnk: 'STNK-8821-JKT', pajakDue: addDays(td, -3), stnkDue: addDays(td, 18) }
+        ],
+        users: [
+          { us: 'superadmin', pw: s, role: 'superadmin', n: 'Super Admin' },
+          { us: 'admin', pw: a, role: 'admin', n: 'Admin Ops' },
+          { us: 'kasir', pw: k, role: 'kasir', n: 'ENI' }
+        ],
+        set: {
+          ppn: 11, pph: 2, term: 14,
+          cicilanTruk: 18000000,
+          jmlSupir: 6,
+          gajiSupirSatuan: 1000000,
+          gajiMontir: 6000000
+        },
+        kasbon: {},
+        expenses: [
+          { id: 'EX-1', tgl: td, waktu: ts, trk: 'B 8821 UC', kat: 'Perbaikan / Servis', ket: 'Ganti selang angin rem trailer & kampas', nom: 650000, oleh: 'Admin Ops' }
+        ],
+        topups: [
+          { id: 'TOP-1', tgl: td, waktu: ts, nom: 15000000, ket: 'Top-up saldo operasional harian token Admin', oleh: 'ENI (Kasir)' }
+        ],
+        rekonNotes: {}
+      };
+    }
+
+    function seedOrders() {
+      const td = today(), ts = nowWib(), P = 'Terminal JICT, Tanjung Priok', D = 'Depo Marunda Empty';
+      const s1 = 'SPK-' + td.slice(2, 4) + td.slice(5, 7) + '-001';
+      const s2 = 'SPK-' + td.slice(2, 4) + td.slice(5, 7) + '-002';
+      const s3 = 'SPK-' + td.slice(2, 4) + td.slice(5, 7) + '-003';
+      return {
+        [s1]: {
+          spk: s1, jenis: 'Import', tgl: td, createdAt: ts, dispatchedAt: ts, acceptedAt: ts,
+          cust: 'PT. Maju Jaya Logistik',
+          srcOrder: { perusahaan: 'PT. Samudra Forwarding', nama: 'Rina Kusuma', telp: '0811-8890-441' },
+          a: P, term: P, t: 'Kawasan Industri Cikarang', depo: D,
+          tipe: 'Trailer 40ft', cont: 'MRKU 4829102', seal: 'SL-99281', ton: '22',
+          cat: 'Bongkar di Gudang B', st: 'Dispatch',
+          items: [{ n: 'Ongkos angkut [Import] Trailer 40ft', q: 1, p: 3600000 }],
+          discType: 'rp', discVal: 0, komisi: 100000, ppn: true, pph: false,
+          uj: 1100000, drv: 'D1', trk: 'B 9123 UA', accepted: true,
+          docs: { term: { lokasi: P, jam: '08:00 WIB', ref: 'DO-8812' }, depo: { lokasi: D, jam: '17:00 WIB', ref: 'EIR-221' } },
+          gatepassDoc: null, photos: {}, drvCond: 'Lancar', drvReport: '', pod: '', tiba: '', drvStep: '', seen: true
+        },
+        [s2]: {
+          spk: s2, jenis: 'Repo', repoDir: 'D2T', tgl: td, createdAt: ts, dispatchedAt: ts,
+          cust: 'PT. Maju Jaya Logistik',
+          srcOrder: { perusahaan: 'PT. Samudra Forwarding', nama: 'Rina Kusuma', telp: '0811-8890-441' },
+          a: D, term: P, t: 'Repo Container', depo: D,
+          tipe: 'Trailer 40ft', cont: 'MSCU 7731904', seal: '-', ton: '0',
+          cat: 'Repo empty setelah bongkar SPK-001', st: 'Dispatch',
+          items: [{ n: 'Ongkos angkut [Repo] Trailer 40ft', q: 1, p: 1200000 }],
+          discType: 'rp', discVal: 0, komisi: 0, ppn: true, pph: false,
+          uj: 350000, drv: 'D1', trk: 'B 9123 UA', accepted: false,
+          docs: { term: { lokasi: P }, depo: { lokasi: D } },
+          gatepassDoc: null, photos: {}, drvCond: 'Lancar', drvReport: '', pod: '', tiba: '', drvStep: '', seen: false
+        },
+        [s3]: {
+          spk: s3, jenis: 'Export', tgl: td, createdAt: ts,
+          cust: 'CV. Sumber Makmur',
+          srcOrder: { perusahaan: 'CV. Sumber Makmur', nama: 'Hendra Wijaya', telp: '0813-7741-900' },
+          a: D, term: P, t: 'Kawasan Industri Cikarang', depo: D,
+          tipe: 'Trailer 40ft', cont: 'CMAU 1120944', seal: 'SL-55102', ton: '20',
+          cat: 'Closing kapal jam 22:00 WIB', st: 'Selesai',
+          items: [{ n: 'Ongkos angkut [Export] Trailer 40ft', q: 1, p: 3500000 }],
+          discType: 'rp', discVal: 0, komisi: 0, ppn: true, pph: false,
+          uj: 1050000, drv: 'D2', trk: 'B 9456 UB', accepted: true, acceptedAt: ts,
+          docs: { term: { lokasi: P }, depo: { lokasi: D } },
+          gatepassDoc: null, photos: {},
+          drvCond: 'Antre Panjang di Terminal / Depo',
+          drvReport: 'Antrean masuk gate JICT sekitar 2,5 jam karena sistem gate sempat offline, namun muatan aman dan masuk sebelum closing.',
+          pod: 'SJ-EXP-889', tiba: td, completedAt: ts, finishedAt: ts, drvStep: '', seen: true
+        }
+      };
+    }
+
+    async function boot() {
+      setInterval(() => {
+        const el = $('wib_clk');
+        if (el) el.textContent = nowWib();
+      }, 1000);
+
+      useBackend = false;
+      try {
+        const h = await apiReq('/api/health');
+        if (h && h.ok) useBackend = true;
+      } catch (e) {
+        useBackend = false;
+      }
+
+      if (useBackend && getApiToken()) {
+        try {
+          const bootData = await apiReq('/api/bootstrap');
+          me = bootData.user;
+          M = bootData.master;
+          O = bootData.orders || {};
+          V = bootData.invoices || {};
+          lsSave();
+          rr();
+          return;
+        } catch (e) {
+          setApiToken('');
+          me = null;
+        }
+      }
+
+      try {
+        const x = JSON.parse(localStorage.getItem(LSK));
+        if (x) { M = x.M; O = x.O; V = x.V; }
+      } catch (e) {}
+      if (!M) { M = await seed(); O = seedOrders(); lsSave(); }
+      rr();
+    }
+
+    /* =========================================================================
+       KALKULASI KEUANGAN, ARMADA & VALIDASI
+       ========================================================================= */
+    const grossSub = o => o.items.reduce((s, i) => s + (Math.max(0, +i.q || 0) * Math.max(0, +i.p || 0)), 0);
+    const discAmt = o => {
+      const g = grossSub(o);
+      if (!o.discVal) return 0;
+      return o.discType == 'pct' ? Math.min(g, g * (+o.discVal / 100)) : Math.min(g, +o.discVal);
+    };
+    const sub = o => Math.max(0, grossSub(o) - discAmt(o));
+    const ppn = o => o.ppn ? sub(o) * M.set.ppn / 100 : 0;
+    const pph = o => o.pph ? sub(o) * M.set.pph / 100 : 0;
+    const tot = o => sub(o) + ppn(o) - pph(o);
+    const drvN = id => (M.drivers.find(d => d.id == id) || {}).n || (id ? `Driver (${id})` : '-');
+    const drvObj = id => M.drivers.find(d => d.id == id) || null;
+    const isSA = () => me && me.role == 'superadmin';
+    const ALL = () => Object.values(O);
+
+    const rt = (jenis, term, t, depo, repoDir) => {
+      if (jenis === 'Repo') {
+        return M.routes.find(r => r.jenis === 'Repo' && (r.repoDir || 'T2D') === (repoDir || 'T2D') && (!term || r.term == term) && (!depo || r.depo == depo))
+          || M.routes.find(r => r.jenis === 'Repo' && (r.repoDir || 'T2D') === (repoDir || 'T2D'));
+      }
+      return M.routes.find(r => (r.jenis || 'Import') == jenis && r.t == t && (!term || r.term == term) && (!depo || r.depo == depo))
+        || M.routes.find(r => (r.jenis || 'Import') == jenis && r.t == t);
+    };
+
+    const busy = (k, v, tgl, ex, jenis) => {
+      if (!v) return null;
+      if (jenis === 'Repo') return null;
+      return ALL().find(o => o.st == 'Dispatch' && o.spk != ex && o.tgl == tgl && o[k] == v);
+    };
+
+    const unseen = () => ALL().filter(o => o.st == 'Dispatch' && o.drv == me.id && !o.seen);
+    const overdueInvs = () => Object.values(V).filter(i => !i.lunas && i.due <= today());
+    const stnkAlerts = () => M.trucks.filter(t => diffDays(t.pajakDue) <= 30 || diffDays(t.stnkDue) <= 30);
+    const hasIssue = o => o.drvCond && o.drvCond !== 'Lancar';
+
+    function getFleetStatus(refDate = today()) {
+      const activeOrders = ALL().filter(o => o.st === 'Dispatch' && o.tgl === refDate);
+      const finishedOrders = ALL().filter(o => ['Selesai', 'Ditagih'].includes(o.st) && (o.tiba || o.tgl) === refDate)
+        .sort((a, b) => (b.finishedAt || b.completedAt || '').localeCompare(a.finishedAt || a.completedAt || ''));
+
+      const activeList = activeOrders.map(o => {
+        const d = drvObj(o.drv);
+        const startRef = o.acceptedAt || o.dispatchedAt || o.createdAt || '';
+        return {
+          spk: o.spk, jenis: o.jenis || 'Import', drvId: o.drv || '',
+          drvName: d ? d.n : (o.drv ? `Driver (${o.drv})` : 'Belum dipilih'),
+          trk: o.trk || (d ? d.plat : '-'), cust: o.cust, rute: fmtRute(o),
+          accepted: o.accepted !== false, dispatchedAt: o.dispatchedAt || o.createdAt || '-',
+          acceptedAt: o.acceptedAt || '-', elapsed: fmtElapsed(startRef),
+          estFinish: estEndWib(startRef, o.jenis || 'Import')
+        };
+      });
+
+      const busyDrvIds = new Set(activeList.map(x => x.drvId).filter(Boolean));
+      const busyTrks = new Set(activeList.map(x => x.trk).filter(Boolean));
+
+      const standbyList = M.trucks.map(t => {
+        const assignedDrv = M.drivers.find(d => d.plat === t.plat);
+        const lastDone = finishedOrders.find(o => o.trk === t.plat || (assignedDrv && o.drv === assignedDrv.id));
+        const isBusy = busyTrks.has(t.plat) || (assignedDrv && busyDrvIds.has(assignedDrv.id));
+        if (isBusy) return null;
+        return {
+          plat: t.plat, jenisUnit: t.jenis,
+          drvId: assignedDrv ? assignedDrv.id : '',
+          drvName: assignedDrv ? assignedDrv.n : 'Tanpa Driver Tetap',
+          state: lastDone ? 'Selesai Order (Standby)' : 'Standby Kosong',
+          lastSpk: lastDone ? lastDone.spk : '',
+          lastDoneAt: lastDone ? (lastDone.finishedAt || lastDone.completedAt || lastDone.tiba || '-') : '',
+          lastRute: lastDone ? fmtRute(lastDone) : ''
+        };
+      }).filter(Boolean);
+
+      return { activeList, standbyList };
+    }
+
+    function renderFleetMonitorCard(refDate = today()) {
+      const { activeList, standbyList } = getFleetStatus(refDate);
+      return `<div class="card">
+        <div class="row" style="margin-bottom:6px">
+          <div>
+            <h2 style="margin:0">Monitor Armada & Prediksi Waktu (${E(refDate)})</h2>
+            <div class="hint">Menampilkan armada yang sedang bertugas beserta estimasi waktu selesai (WIB), serta armada standby yang siap menerima order.</div>
+          </div>
+          <span class="tag st-Dispatch">${activeList.length} Sedang Berjalan</span>
+          <span class="tag st-Selesai">${standbyList.length} Standby</span>
+        </div>
+        <div class="fleet-grid">
+          <div>
+            <h3 style="margin-top:6px">🟢 Armada Standby / Siap Order (${standbyList.length})</h3>
+            ${standbyList.length ? standbyList.map(s => `<div class="f-card standby">
+              <div class="f-top">
+                <b>${E(s.plat)} · ${E(s.drvName)}</b>
+                <span class="tag" style="background:var(--ok);color:#fff">${E(s.state)}</span>
+              </div>
+              <div class="f-meta">${E(s.jenisUnit)}${s.lastSpk ? `<br>Selesai <b>${E(s.lastSpk)}</b> (${E(s.lastRute)}) · <b>${E(s.lastDoneAt)}</b>` : '<br>Belum ada order aktif/selesai pada tanggal ini.'}</div>
+              <div><button class="b s o" onclick="quickBookWithUnit('${E(s.drvId)}','${E(s.plat)}','${E(refDate)}')">+ Tugaskan Order</button></div>
+            </div>`).join('') : '<p class="hint">Semua unit armada sedang menjalankan order.</p>'}
+          </div>
+          <div>
+            <h3 style="margin-top:6px">🚚 Armada Sedang Menerima Order & Estimasi Selesai (${activeList.length})</h3>
+            ${activeList.length ? activeList.map(a => `<div class="f-card active">
+              <div class="f-top">
+                <b>${E(a.trk)} · ${E(a.drvName)}</b>
+                <span class="tag ${jClass(a.jenis)}">${E(jLabel(a.jenis))}</span>
+              </div>
+              <div class="f-meta">
+                <b>${E(a.spk)}</b> (${E(a.cust)}) · ${a.accepted ? '<span class="ok">Diterima</span>' : '<span class="bad">Menunggu Konfirmasi</span>'}<br>
+                Rute: ${E(a.rute)}<br>
+                Mulai/Dispatch: <b>${E(a.acceptedAt !== '-' ? a.acceptedAt : a.dispatchedAt)}</b> · Durasi: <b>${E(a.elapsed)}</b><br>
+                Prediksi Selesai: <b style="color:var(--ac)">~${E(a.estFinish)}</b>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button class="b s g" onclick="openO('${E(a.spk)}')">Buka SPK</button>
+                <button class="b s o" onclick="quickBookWithUnit('${E(a.drvId)}','${E(a.trk)}','${E(refDate)}','Repo')">+ Lanjut Repo</button>
+              </div>
+            </div>`).join('') : '<p class="hint">Tidak ada armada yang sedang menjalankan order aktif.</p>'}
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function quickBookWithUnit(drvId, plat, tgl, defaultJenis = '') {
+      bkPreselect = { drv: drvId || '', trk: plat || '' };
+      newBk(defaultJenis, tgl || today());
+    }
+
+    /* =========================================================================
+       NAVIGASI, AUTENTIKASI & EKSPOR PDF / EXCEL
+       ========================================================================= */
+    const NAVS = {
+      superadmin: [['dash', 'Dashboard'], ['ord', 'Order (SPK)'], ['upl', 'Upload Data'], ['mnt', 'Maintenance'], ['rpt', 'Laporan Trucking'], ['pnl', 'Laba Rugi'], ['inv', 'Invoice'], ['kas', 'Kasir & Rekon'], ['mst', 'Master'], ['cfg', 'Pengaturan']],
+      admin: [['dash', 'Dashboard'], ['ord', 'Order (SPK)'], ['upl', 'Upload Data'], ['mnt', 'Maintenance'], ['rek', 'Rekon Token Ops'], ['rpt', 'Laporan Trucking'], ['mst', 'Master']],
+      kasir: [['inv', 'Invoice & Tagihan'], ['kas', 'Top-Up & Rekon Ops'], ['cst', 'Data Customer']],
+      driver: [['drv', 'Order Saya']]
+    };
+
+    function verifySession() {
+      let tok = null;
+      try { tok = sessionStorage.getItem('tms_tok'); } catch (e) {}
+      if (!tok || !tok.includes(':')) return null;
+      const [u, sig] = tok.split(':');
+      const a = M.users.find(x => x.us == u && x.pw.slice(0, 16) == sig);
+      if (a) return { role: a.role, us: a.us, n: a.n };
+      const d = M.drivers.find(x => x.us.toLowerCase() == u && x.pw.slice(0, 16) == sig);
+      if (d) return { role: 'driver', us: d.us, id: d.id, n: d.n };
+      return null;
+    }
+
+    function getMenuExportPayload(menuKey) {
+      const ts = nowWib();
+      if (menuKey === 'dash') {
+        const rows = ALL().map(o => [o.spk, jLabel(o.jenis), o.tgl, o.createdAt || '-', o.cust, fmtSrcOrder(o), fmtRute(o), drvN(o.drv), o.trk || '-', o.st, o.drvCond || 'Lancar', o.drvReport || '-']);
+        return { title: 'Rekap Dashboard Operasional & Status Order', meta: `Dicetak oleh: ${me.n} (${me.role}) · ${ts}`, file: `Dashboard_Greenasia_${today()}.xls`, headers: ['No. SPK', 'Jenis Order', 'Tgl Muat', 'Waktu Input WIB', 'Customer', 'Sumber Order', 'Alur Rute', 'Driver', 'No. Polisi', 'Status', 'Situasi Lapangan', 'Catatan Kendala'], rows };
+      }
+      if (menuKey === 'ord') {
+        const rows = ALL().map(o => [o.spk, jLabel(o.jenis), o.tgl, o.createdAt || '-', o.cust, fmtSrcOrder(o), fmtRute(o), o.tipe, o.cont || '-', drvN(o.drv), o.trk || '-', o.st, sub(o), o.uj, o.drvCond || 'Lancar', o.drvReport || '-']);
+        return { title: 'Rekap Data Order Trucking (SPK)', meta: `Dicetak oleh: ${me.n} · ${ts}`, file: `Order_SPK_Greenasia_${today()}.xls`, headers: ['No. SPK', 'Jenis', 'Tgl Muat', 'Waktu WIB', 'Customer', 'Sumber Order', 'Alur Rute', 'Tipe Trailer', 'Container', 'Driver', 'No. Polisi', 'Status', 'Ongkos Netto', 'Uang Jalan', 'Situasi', 'Catatan Driver'], rows };
+      }
+      if (menuKey === 'upl') {
+        const rows = ALL().map(o => [o.spk, jLabel(o.jenis), o.tgl, fmtRute(o), drvN(o.drv), o.trk || '-', (o.docs && o.docs.term && o.docs.term.lokasi) || '-', (o.docs && o.docs.depo && o.docs.depo.lokasi) || '-', (o.gatepassDoc && o.gatepassDoc.name) || 'Belum ada file']);
+        return { title: 'Rekap Upload Data Terminal, Depo & Gatepass', meta: `Dicetak oleh: ${me.n} · ${ts}`, file: `Upload_Data_Greenasia_${today()}.xls`, headers: ['No. SPK', 'Jenis', 'Tgl Muat', 'Alur Rute', 'Driver', 'No. Polisi', 'Terminal', 'Depo Empty', 'File Gatepass / Bon Muat'], rows };
+      }
+      if (menuKey === 'mnt') {
+        const rows = (M.expenses || []).map(e => [e.tgl, e.waktu || '-', e.trk, e.kat, e.ket, e.oleh || '-', e.nom]);
+        return { title: 'Rekap Maintenance, Perbaikan Mobil, Sparepart & Biaya Lainnya', meta: `Dicetak oleh: ${me.n} · ${ts}`, file: `Maintenance_Greenasia_${today()}.xls`, headers: ['Tanggal', 'Waktu Input WIB', 'Unit Truk', 'Kategori', 'Rincian', 'Diinput Oleh', 'Biaya (Rp)'], rows };
+      }
+      if (menuKey === 'rek' || menuKey === 'kas') {
+        const topRows = (M.topups || []).map(t => ['TOP-UP KASIR', t.tgl, t.waktu || '-', t.ket, t.oleh || '-', t.nom]);
+        const ujRows = ALL().filter(o => o.st !== 'Batal' && o.uj > 0).map(o => ['UANG JALAN SPK', o.tgl, o.dispatchedAt || o.createdAt || '-', `${o.spk} (${o.cust}) - ${drvN(o.drv)}`, 'Admin Ops', -o.uj]);
+        const expRows = (M.expenses || []).map(e => ['MAINTENANCE / BIAYA', e.tgl, e.waktu || '-', `${e.trk} (${e.kat}) - ${e.ket}`, e.oleh || '-', -e.nom]);
+        return { title: 'Rekap Rekonsiliasi Top-Up Kasir & Token Operasional Admin', meta: `Dicetak oleh: ${me.n} · ${ts}`, file: `Rekon_Token_Ops_${today()}.xls`, headers: ['Jenis Mutasi', 'Tanggal', 'Waktu WIB', 'Keterangan', 'Petugas', 'Mutasi Saldo (Rp)'], rows: [...topRows, ...ujRows, ...expRows] };
+      }
+      if (menuKey === 'rpt') {
+        const rows = ALL().filter(o => ['Selesai', 'Ditagih'].includes(o.st)).map(o => [o.spk, jLabel(o.jenis), o.tgl, o.tiba || '-', o.finishedAt || '-', o.cust, fmtSrcOrder(o), fmtRute(o), o.tipe, drvN(o.drv), o.trk || '-', o.drvCond || 'Lancar', o.drvReport || '-', sub(o), o.uj, +o.komisi || 0, sub(o) - o.uj - (+o.komisi || 0), o.st]);
+        return { title: 'Laporan Trucking Operasional Lengkap', meta: `Dicetak oleh: ${me.n} · ${ts}`, file: `Laporan_Trucking_${today()}.xls`, headers: ['No. SPK', 'Jenis', 'Tgl Muat', 'Tgl Selesai', 'Waktu Selesai WIB', 'Customer', 'Sumber Order', 'Alur Rute', 'Tipe', 'Driver', 'No. Polisi', 'Situasi', 'Catatan Kendala', 'Pendapatan Netto', 'Uang Jalan', 'Komisi', 'Margin', 'Status'], rows };
+      }
+      if (menuKey === 'pnl') {
+        const ym = window.pnlMonth || today().slice(0, 7);
+        const d = getPnlData(ym);
+        return {
+          title: 'Laporan Laba Rugi Operasional Trucking',
+          meta: `Periode Bulan: ${ym} | Total Trip Selesai: ${d.doneOrders.length} Ritase`,
+          file: `Laba_Rugi_Operasional_${ym}.xls`,
+          headers: ['Komponen Pendapatan & Beban Biaya', 'Keterangan / Rincian', 'Nominal (Rp)'],
+          rows: [
+            ['PENDAPATAN OPERASIONAL', '', ''],
+            ['Pendapatan Jasa Trucking (Netto DPP)', `${d.doneOrders.length} SPK Selesai / Ditagih`, R(d.revNetto)],
+            ['BEBAN OPERASIONAL LANGSUNG', '', ''],
+            ['Beban Uang Jalan Driver', `${d.doneOrders.length} Trip`, `- ${R(d.totUj)}`],
+            ['Beban Komisi SPK', 'Komisi order', `- ${R(d.totKomisi)}`],
+            ['Beban Maintenance, Servis & Sparepart', `${d.expList.length} Transaksi`, `- ${R(d.totMaint)}`],
+            ['LABA KOTOR OPERASIONAL', '', R(d.grossProfit)],
+            ['BEBAN TETAP BULANAN (OVERHEAD)', '', ''],
+            ['Beban Cicilan Trucking', 'Angsuran armada bulanan', `- ${R(d.cicilan)}`],
+            [`Beban Gaji Supir (${d.jmlSupir} Orang × ${R(d.gajiSupirSatuan)})`, 'Gaji pokok bulanan driver', `- ${R(d.totGajiSupir)}`],
+            ['Beban Gaji Montir / Mekanik', 'Gaji montir bulanan', `- ${R(d.gajiMontir)}`],
+            ['LABA / RUGI BERSIH OPERASIONAL', d.netProfit >= 0 ? 'SURPLUS / LABA' : 'DEFISIT / RUGI', R(d.netProfit)]
+          ]
+        };
+      }
+      if (menuKey === 'inv') {
+        const rows = Object.values(V).map(i => [i.no, i.tgl, i.due, i.cust, (i.orders || []).join(', '), i.total]);
+        return { title: 'Rekap Invoice & Tagihan Customer', meta: `Dicetak oleh: ${me.n} · ${ts}`, file: `Invoice_Greenasia_${today()}.xls`, headers: ['No. Invoice', 'Tanggal', 'Jatuh Tempo', 'Customer', 'Daftar SPK', 'Total Tagihan (Rp)'], rows };
+      }
+      if (menuKey === 'cst') {
+        const rows = (M.custList || []).map(c => [c.n, c.al || '-']);
+        return { title: 'Rekap Data Customer', meta: `Dicetak oleh: ${me.n} · ${ts}`, file: `Data_Customer_${today()}.xls`, headers: ['Nama Customer', 'Alamat Penagihan'], rows };
+      }
+      if (menuKey === 'mst') {
+        const rows = M.trucks.map(t => {
+          const d = M.drivers.find(x => x.plat === t.plat) || {};
+          return [t.plat, t.jenis, t.stnk || '-', t.pajakDue || '-', t.stnkDue || '-', d.n || '-', d.hp || '-'];
+        });
+        return { title: 'Rekap Master Armada, STNK & Driver', meta: `Dicetak oleh: ${me.n} · ${ts}`, file: `Master_Armada_${today()}.xls`, headers: ['No. Polisi', 'Jenis Unit', 'No. STNK', 'Tgl Pajak Tahunan', 'Masa Berlaku STNK', 'Driver Melekat', 'No. HP'], rows };
+      }
+      return null;
+    }
+
+    function exportMenuExcel(menuKey) {
+      const p = getMenuExportPayload(menuKey);
+      if (!p) return;
+      const html = `<html><head><meta charset="utf-8"></head><body>
+        ${KOP_HTML}
+        <h3 style="margin:6px 0 2px;font-family:Arial,sans-serif">${E(p.title)}</h3>
+        <div style="font-size:11px;color:#555;margin-bottom:10px;font-family:Arial,sans-serif">${E(p.meta)}</div>
+        <table border="1" cellspacing="0" cellpadding="5" style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:11px">
+          <thead><tr>${p.headers.map(h => `<th style="background:#27533b;color:#fff">${E(h)}</th>`).join('')}</tr></thead>
+          <tbody>${p.rows.map(r => `<tr>${r.map(v => `<td>${E(v)}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table>
+      </body></html>`;
+      const blob = new Blob(['\uFEFF' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = p.file;
+      a.click();
+      showToast('File Excel (.xls) berhasil diunduh.');
+    }
+
+    function exportMenuPdf(menuKey) {
+      const p = getMenuExportPayload(menuKey);
+      if (!p) return;
+      modal(`<div class="a4-inv">
+        ${KOP_HTML}
+        <h2 style="margin:4px 0;color:#1b3b2b">${E(p.title)}</h2>
+        <div class="hint" style="margin-bottom:10px">${E(p.meta)}</div>
+        <div class="tw"><table class="a4-items" style="table-layout:auto">
+          <thead><tr>${p.headers.map(h => `<th>${E(h)}</th>`).join('')}</tr></thead>
+          <tbody>${p.rows.map(r => `<tr>${r.map(v => `<td>${E(v)}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table></div>
+        <div class="a4-foot"><span>${CO.n} · Dokumen Resmi</span><span>Waktu Cetak: ${nowWib()}</span></div>
+      </div>
+      <div class="row np" style="margin-top:12px">
+        <button class="b" onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
+        <button class="b o" onclick="exportMenuExcel('${E(menuKey)}')">📥 Download Excel</button>
+        <button class="b g" onclick="closeM()">Tutup</button>
+      </div>`);
+    }
+
+    const exportBtnsHtml = menuKey => `<span style="display:inline-flex;gap:6px;flex-wrap:wrap">
+      <button class="b s g" onclick="exportMenuPdf('${menuKey}')">📄 Download / Cetak PDF</button>
+      <button class="b s g" onclick="exportMenuExcel('${menuKey}')">📊 Download Excel</button>
+    </span>`;
+
+    /* =========================================================================
+       RENDER UTAMA & HALAMAN LOGIN
+       ========================================================================= */
+    function rr() {
+      const r = $('root');
+      if (!M) return;
+      if (!me && !useBackend) me = verifySession();
+      if (!me) {
+        if (!$('lu')) {
+          r.innerHTML = `<div class="login card">
+            <h2>${CO.n}</h2>
+            <p class="hint">${E(CO.a)}</p>
+            <label>Username<input id="lu" autocomplete="username"></label>
+            <label style="margin-top:10px">Password<input id="lp" type="password" autocomplete="current-password" onkeydown="if(event.key=='Enter')login()"></label>
+            <p class="bad" id="le"></p>
+            <button class="b" onclick="login()">Masuk</button>
+            <p class="hint" style="margin-top:12px">Mode Penyimpanan: ${useBackend ? '<b class="ok">Server Web (Sinkron Multi-Device)</b>' : '<b>Lokal Browser (Standalone)</b>'}</p>
+          </div>`;
+        }
+        return;
+      }
+
+      const nav = NAVS[me.role];
+      if (!nav.some(n => n[0] == view)) view = nav[0][0];
+
+      let bell = '';
+      if (me.role == 'driver') {
+        const n = unseen().length;
+        bell = n ? `<span class="bell" onclick="go('drv')">🔔 ${n} baru</span>` : '';
+        if (n > lastBell) showToast('Order baru masuk ke daftar tugas Anda.');
+        lastBell = n;
+      }
+      if (['admin', 'superadmin'].includes(me.role)) {
+        const sa = stnkAlerts().length;
+        if (sa) bell += `<span class="bell bad" onclick="go('mst')">🚨 ${sa} STNK/Pajak</span>`;
+      }
+      if (['kasir', 'superadmin'].includes(me.role)) {
+        const ov = overdueInvs().length;
+        if (ov) bell += `<span class="bell bad" onclick="go('inv')">⚠️ ${ov} Jatuh Tempo</span>`;
+      }
+
+      const views = { dash, ord, upl, mnt, rek, rpt, pnl, inv, kas, cst, mst, cfg, drv };
+      r.innerHTML = `<header>
+        <div class="brand-box">
+          <h1>GREENASIA TMS</h1>
+          <span class="brand-sub">PT. GREENASIA TUNAS RAYA · TANJUNG PRIOK</span>
+        </div>
+        <nav>${nav.map(n => `<button class="${n[0] == view ? 'on' : ''}" onclick="go('${n[0]}')">${n[1]}</button>`).join('')}</nav>
+        <span class="who">
+          <span id="wib_clk" class="wib-clock">${nowWib()}</span>
+          ${bell}
+          <span>${E(me.n)} · <b>${E(me.role)}</b></span>
+          ${useBackend ? '<button class="b g s" onclick="syncNow()" title="Muat ulang data terbaru dari server">🔄 Sync</button>' : ''}
+          <button class="b g s" onclick="logout()">Keluar</button>
+        </span>
+      </header>
+      <main>${views[view]()}</main>`;
+    }
+
+    const go = v => { view = v; rr(); };
+
+    async function login() {
+      const u = $('lu').value.trim().toLowerCase();
+      const rawPw = $('lp').value;
+
+      if (useBackend) {
+        try {
+          const resp = await apiReq('/api/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ username: u, password: rawPw })
+          });
+          setApiToken(resp.token);
+          me = resp.user;
+          const bootData = await apiReq('/api/bootstrap');
+          M = bootData.master;
+          O = bootData.orders || {};
+          V = bootData.invoices || {};
+          lsSave();
+          view = me.role == 'driver' ? 'drv' : me.role == 'kasir' ? 'inv' : 'dash';
+          rr();
+          return;
+        } catch (e) {
+          if ($('le')) $('le').textContent = e.message || 'Username atau password salah.';
+          return;
+        }
+      }
+
+      const h = await H(rawPw);
+      const a = M.users.find(x => x.us == u && x.pw == h);
+      const d = M.drivers.find(x => x.us.toLowerCase() == u && x.pw == h);
+      if (a) me = { role: a.role, us: a.us, n: a.n };
+      else if (d) me = { role: 'driver', us: d.us, id: d.id, n: d.n };
+      else {
+        if ($('le')) $('le').textContent = 'Username atau password salah.';
+        return;
+      }
+      try { sessionStorage.setItem('tms_tok', u + ':' + h.slice(0, 16)); } catch (e) {}
+      view = me.role == 'driver' ? 'drv' : me.role == 'kasir' ? 'inv' : 'dash';
+      rr();
+    }
+
+    function logout() {
+      if (useBackend && getApiToken()) {
+        apiReq('/api/auth/logout', { method: 'POST' }).catch(() => {});
+      }
+      setApiToken('');
+      me = null;
+      lastBell = 0;
+      try { sessionStorage.removeItem('tms_tok'); } catch (e) {}
+      rr();
+    }
+
+    function modal(h) { $('md').innerHTML = h; $('mw').classList.add('on'); }
+    function closeM() { $('mw').classList.remove('on'); rr(); }
+
+    /* =========================================================================
+       VIEWER FOTO & DOKUMEN GATEPASS / BON MUAT
+       ========================================================================= */
+    function viewPhoto(spk, type) {
+      const o = gO(spk), src = (o.photos || {})[type];
+      if (!src) return;
+      const title = type == 'pod' ? 'Foto Surat Jalan / POD' : 'Foto Segel / Container';
+      modal(`<div class="row"><h2 style="margin:0">${title} · ${E(spk)}</h2><button class="b g s" style="margin-left:auto" onclick="openO('${E(spk)}')">← Kembali ke SPK</button></div>
+      <div style="text-align:center;margin:14px 0"><img src="${src}" style="max-width:100%;max-height:72vh;border-radius:6px;border:1px solid var(--ln)"></div>
+      <div class="row"><a class="b" href="${src}" download="${E(spk)}_${type}.jpg">Unduh Foto</a><button class="b g" onclick="closeM()">Tutup</button></div>`);
+    }
+
+    function viewGatepassDoc(spk, fromDriver = false) {
+      const o = gO(spk);
+      const doc = o && o.gatepassDoc;
+      if (!doc || !doc.dataUrl) return showToast('Tidak ada file Gatepass / Bon Muat pada order ini.');
+      const backBtn = fromDriver
+        ? `<button class="b g s" style="margin-left:auto" onclick="closeM()">← Kembali ke Order Saya</button>`
+        : `<button class="b g s" style="margin-left:auto" onclick="openO('${E(spk)}')">← Kembali ke SPK</button>`;
+      const bodyHtml = doc.kind === 'pdf'
+        ? `<iframe src="${doc.dataUrl}" style="width:100%;height:68vh;border:1px solid var(--ln);border-radius:4px;background:#fff"></iframe>`
+        : `<div style="text-align:center;margin:12px 0"><img src="${doc.dataUrl}" style="max-width:100%;max-height:68vh;border-radius:6px;border:1px solid var(--ln)"></div>`;
+      modal(`<div class="row"><h2 style="margin:0">Dokumen Gatepass / Bon Muat · ${E(spk)}</h2>${backBtn}</div>
+      <div class="hint" style="margin:6px 0">File: <b>${E(doc.name)}</b> (${doc.sizeKb || 0} KB) · Diunggah: ${E(doc.uploadedAt || '-')}</div>
+      ${bodyHtml}
+      <div class="row" style="margin-top:12px">
+        <a class="b o" href="${doc.dataUrl}" download="${E(doc.name)}">📥 Download File</a>
+        <button class="b g" onclick="closeM()">Tutup</button>
+      </div>`);
+    }
+
+    function renderDocAttachmentBlock(o, fromDriver = false) {
+      const doc = o.gatepassDoc;
+      if (!doc || !doc.dataUrl) {
+        return `<div class="doc-box"><span class="hint">Lampiran Gatepass / Bon Muat Depo: Belum dilampirkan.</span></div>`;
+      }
+      return `<div class="doc-box">
+        <div>
+          <b>📎 File Gatepass / Bon Muat Depo (${E(doc.kind === 'pdf' ? 'PDF' : 'FOTO')})</b>
+          <div class="hint">${E(doc.name)} · ${doc.sizeKb || 0} KB · Upload: ${E(doc.uploadedAt || '-')}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="b s g" onclick="viewGatepassDoc('${E(o.spk)}',${fromDriver})">👁️ Buka / Lihat</button>
+          <a class="b s o" href="${doc.dataUrl}" download="${E(doc.name)}">📥 Download File</a>
+        </div>
+      </div>`;
+    }
+
+    /* =========================================================================
+       DASHBOARD & DAFTAR ORDER (SPK)
+       ========================================================================= */
+    const lst = (L, empty) => L.length ? `<div class="tw"><table>
+      <tr><th>SPK</th><th>Jenis</th><th>Tgl & Waktu WIB</th><th>Customer / Sumber</th><th>Alur Rute</th><th>Driver & No. Polisi</th><th>Status</th><th></th></tr>
+      ${L.map(o => {
+        const j = o.jenis || 'Import';
+        const srcTxt = fmtSrcOrder(o);
+        return `<tr>
+          <td><b>${E(o.spk)}</b></td>
+          <td><span class="tag ${jClass(j)}">${E(jLabel(j))}</span></td>
+          <td>${E(o.tgl)}<div class="hint">${E(o.createdAt || '')}</div></td>
+          <td><b>${E(o.cust)}</b><div class="hint">${srcTxt !== '-' ? 'Sumber: ' + E(srcTxt) : E(o.tipe)}</div></td>
+          <td>${E(fmtRute(o))}<div class="hint">${E(o.tipe)}${o.cont ? ' · ' + E(o.cont) : ''}</div></td>
+          <td>${E(drvN(o.drv))}<div class="hint">${E(o.trk || '-')}</div></td>
+          <td>
+            <span class="tag st-${E(o.st)}">${E(o.st)}</span>
+            ${hasIssue(o) ? ' <span class="tag" style="background:var(--bad);color:#fff">⚠️ Kendala</span>' : ''}
+            ${(o.photos && (o.photos.pod || o.photos.seal)) ? ' 📷' : ''}
+            ${o.alasan ? `<div class="hint">${E(o.alasan)}</div>` : ''}
+          </td>
+          <td><button class="b s g" onclick="openO('${E(o.spk)}')">Buka</button></td>
+        </tr>`;
+      }).join('')}
+    </table></div>` : `<p class="hint">${empty}</p>`;
+
+    const byD = L => L.sort((a, b) => (a.tgl + (a.createdAt || '')) < (b.tgl + (b.createdAt || '')) ? -1 : 1);
+
+    function dash() {
+      const A = ALL(), run = byD(A.filter(o => o.st == 'Dispatch')), nx = byD(A.filter(o => o.st == 'Booking')), sa = stnkAlerts();
+      const issues = A.filter(o => ['Selesai', 'Ditagih'].includes(o.st) && hasIssue(o));
+      const { activeList, standbyList } = getFleetStatus(today());
+      const curYm = today().slice(0, 7);
+      const pnlNow = getPnlData(curYm);
+      const queuedNext = ALL().filter(o => o.st === 'Dispatch' && o.accepted === false).concat(nx);
+
+      const saMonitorHtml = isSA() ? `<div class="card" style="border-top:4px solid var(--ac)">
+        <div class="row" style="margin-bottom:10px">
+          <div>
+            <h2 style="margin:0">Executive Operational & Fleet Command (Superadmin)</h2>
+            <div class="hint">Ringkasan performa operasional bulan berjalan (${curYm}), status armada aktif, dan antrean order berikutnya.</div>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">
+            <button class="b s g" onclick="go('pnl')">📊 Buka Laba Rugi</button>
+            <button class="b s o" onclick="go('cfg')">⚙️ Pengaturan User</button>
+          </div>
+        </div>
+        <div class="row" style="margin-bottom:10px">
+          <div class="stat"><b>${activeList.length} / ${M.trucks.length} Unit</b><span>Armada Berjalan / Total Unit (${standbyList.length} Standby)</span></div>
+          <div class="stat warn"><b>${queuedNext.length} Order</b><span>Antrean Order Berikutnya (Menunggu / Draft)</span></div>
+          <div class="stat"><b>${R(pnlNow.revNetto)}</b><span>Omzet Trucking Bulan Ini (${pnlNow.doneOrders.length} Trip)</span></div>
+          <div class="stat ${pnlNow.netProfit >= 0 ? 'ok' : 'bad'}"><b>${R(pnlNow.netProfit)}</b><span>Estimasi Laba/Rugi Bersih (${curYm})</span></div>
+        </div>
+      </div>` : '';
+
+      const nextOrdersHtml = `<div class="card">
+        <div class="row" style="margin-bottom:8px">
+          <div>
+            <h2 style="margin:0">Detail Antrean Order Berikutnya (${queuedNext.length})</h2>
+            <div class="hint">Mencakup order lanjutan (seperti Repo Container) yang telah di-dispatch ke driver maupun draft booking siap jalan.</div>
+          </div>
+          <button class="b o" style="margin-left:auto" onclick="newBk()">+ Booking Order Langsung</button>
+        </div>
+        ${queuedNext.length ? `<div class="tw"><table>
+          <tr><th>SPK</th><th>Jenis</th><th>Tgl Muat & Waktu Input</th><th>Customer</th><th>Alur Rute & Container</th><th>Driver & No. Polisi</th><th>Tahap Antrean</th><th></th></tr>
+          ${queuedNext.map(o => `<tr>
+            <td><b>${E(o.spk)}</b></td>
+            <td><span class="tag ${jClass(o.jenis)}">${E(jLabel(o.jenis))}</span></td>
+            <td>${E(o.tgl)}<div class="hint">${E(o.createdAt || '-')}</div></td>
+            <td><b>${E(o.cust)}</b></td>
+            <td>${E(fmtRute(o))}<div class="hint">${E(o.tipe)}${o.cont ? ' · ' + E(o.cont) : ''}</div></td>
+            <td><b>${E(drvN(o.drv))}</b><div class="hint">${E(o.trk || '-')}</div></td>
+            <td>${o.st === 'Dispatch' ? '<span class="tag st-Dispatch">Antrean Driver (Menunggu Mulai)</span>' : '<span class="tag st-Booking">Draft Booking (Siap Dispatch)</span>'}</td>
+            <td><button class="b s g" onclick="openO('${E(o.spk)}')">Detail / Edit</button></td>
+          </tr>`).join('')}
+        </table></div>` : '<p class="hint">Belum ada antrean order berikutnya.</p>'}
+      </div>`;
+
+      return `${sa.length ? `<div class="card" style="border-left:5px solid var(--bad)"><b class="bad">🚨 Peringatan STNK / Pajak Tahunan Armada (${sa.length} Unit):</b><div class="hint">${sa.map(t => { const dp = diffDays(t.pajakDue), ds = diffDays(t.stnkDue); return `<b>${E(t.plat)}</b> (Pajak: ${dp < 0 ? 'EXPIRED ' + Math.abs(dp) + ' hari' : dp + ' hari lagi'} · STNK 5Th: ${ds < 0 ? 'EXPIRED' : ds + ' hari lagi'})`; }).join(' · ')} — <a href="#" onclick="go('mst');return false">Cek Master Armada</a></div></div>` : ''}
+      ${issues.length ? `<div class="card" style="border-left:5px solid var(--ac2)"><b style="color:var(--bad)">⚠️ Laporan Kendala Lapangan Driver (${issues.length} Order):</b><div class="hint" style="margin-top:4px">${issues.slice(0, 3).map(o => `<b>${E(o.spk)}</b> (${E(drvN(o.drv))} - ${E(o.drvCond)}): "${E(o.drvReport || '-')}" · <a href="#" onclick="openO('${E(o.spk)}');return false">Buka SPK</a>`).join('<br>')}</div></div>` : ''}
+      ${saMonitorHtml}
+      <div class="card"><div class="row"><h2 style="margin:0">Ringkasan Operasional</h2><div style="margin-left:auto">${exportBtnsHtml('dash')}</div></div><div class="row" style="margin-top:8px">
+        <div class="stat"><b>${run.length}</b><span>Order berjalan</span></div>
+        <div class="stat warn"><b>${nx.length}</b><span>Draft booking</span></div>
+        <div class="stat"><b>${A.filter(o => (o.jenis || 'Import') == 'Import' && o.st != 'Batal').length} / ${A.filter(o => o.jenis == 'Export' && o.st != 'Batal').length} / ${A.filter(o => o.jenis == 'Repo' && o.st != 'Batal').length}</b><span>Import / Export / Repo</span></div>
+        <div class="stat ok"><b>${A.filter(o => o.st == 'Selesai').length}</b><span>Selesai (menunggu kasir)</span></div>
+      </div></div>
+      ${renderFleetMonitorCard(today())}
+      ${nextOrdersHtml}
+      <div class="card"><div class="row"><h2 style="margin:0">Order berjalan</h2><button class="b o" style="margin-left:auto" onclick="newBk()">+ Booking order langsung</button></div>${lst(run, 'Tidak ada order yang sedang berjalan.')}</div>`;
+    }
+
+    function ord() {
+      const q = fSearch.toLowerCase();
+      const L = ALL().filter(o => {
+        const j = o.jenis || 'Import';
+        if (fJenis !== 'ALL' && j !== fJenis) return false;
+        if (fStatus !== 'ALL' && o.st !== fStatus) return false;
+        if (!q) return true;
+        return [o.spk, j, o.cust, fmtSrcOrder(o), o.term, o.t, o.depo, o.cont, o.trk, drvN(o.drv), o.drvCond, o.drvReport]
+          .some(x => String(x || '').toLowerCase().includes(q));
+      }).sort((a, b) => a.spk < b.spk ? 1 : -1);
+
+      return `<div class="card">
+        <div class="row" style="margin-bottom:12px">
+          <h2 style="margin:0">Order trucking (SPK)</h2>
+          <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">
+            ${exportBtnsHtml('ord')}
+            <button class="b o" onclick="newBk()">+ Booking order langsung</button>
+          </div>
+        </div>
+        <div class="row" style="margin-bottom:12px">
+          <label style="flex:2;min-width:200px">Cari SPK / Customer / Sumber Order / Rute / Kendala
+            <input value="${E(fSearch)}" placeholder="Ketik kata kunci..." oninput="fSearch=this.value;rr()">
+          </label>
+          <label style="max-width:180px">Jenis Order<select onchange="fJenis=this.value;rr()">
+            <option value="ALL" ${fJenis == 'ALL' ? 'selected' : ''}>Semua Jenis</option>
+            <option value="Import" ${fJenis == 'Import' ? 'selected' : ''}>1. Import</option>
+            <option value="Export" ${fJenis == 'Export' ? 'selected' : ''}>2. Export</option>
+            <option value="Repo" ${fJenis == 'Repo' ? 'selected' : ''}>3. Repo Container</option>
+          </select></label>
+          <label style="max-width:180px">Filter Status<select onchange="fStatus=this.value;rr()">
+            <option value="ALL" ${fStatus == 'ALL' ? 'selected' : ''}>Semua Status (${ALL().length})</option>
+            ${[...ST, 'Batal'].map(s => `<option value="${s}" ${fStatus == s ? 'selected' : ''}>${s}</option>`).join('')}
+          </select></label>
+        </div>
+        ${lst(L, 'Tidak ada order yang sesuai filter.')}
+      </div>`;
+    }
+
+    /* =========================================================================
+       BOOKING ORDER LANGSUNG (TANPA PENAWARAN) + SUMBER ORDER + GATEPASS
+       ========================================================================= */
+    const dl = (id, v) => `<datalist id="${id}">${[...new Set(v.filter(Boolean))].map(x => `<option value="${E(x)}">`).join('')}</datalist>`;
+
+    function buildDriverSelectHtml(id, selectedDrvId, tgl, jenis, exSpk = '', onchangeFn = 'onBkDriverChange()') {
+      return `<select id="${id}" onchange="${onchangeFn}">
+        <option value="">– pilih driver (melekat no. polisi) –</option>
+        ${M.drivers.map(d => {
+          const b = busy('drv', d.id, tgl, exSpk, jenis);
+          return `<option value="${E(d.id)}" ${selectedDrvId == d.id ? 'selected' : ''} ${b ? 'disabled' : ''}>${E(d.n)} (${E(d.plat)})${b ? ' — sedang ' + b.spk : ''}</option>`;
+        }).join('')}
+      </select>`;
+    }
+
+    function buildTruckSelectHtml(id, selectedPlat, tgl, jenis, exSpk = '', onchangeFn = '') {
+      return `<select id="${id}" ${onchangeFn ? `onchange="${onchangeFn}"` : ''}>
+        <option value="">– pilih no. polisi unit –</option>
+        ${M.trucks.map(t => {
+          const b = busy('trk', t.plat, tgl, exSpk, jenis);
+          return `<option value="${E(t.plat)}" ${selectedPlat == t.plat ? 'selected' : ''} ${b ? 'disabled' : ''}>${E(t.plat)} (${E(t.jenis)})${b ? ' — sedang ' + b.spk : ''}</option>`;
+        }).join('')}
+      </select>`;
+    }
+
+    function newBk(forcedJenis = '', forcedTgl = '') {
+      tmpBkDoc = null;
+      const defJenis = forcedJenis || 'Import';
+      const defTgl = forcedTgl || today();
+      const preDrv = bkPreselect.drv || '';
+      const preObj = preDrv ? drvObj(preDrv) : null;
+      const preTrk = bkPreselect.trk || (preObj ? preObj.plat : '');
+      bkPreselect = { drv: '', trk: '' };
+
+      modal(`<h2>Booking order langsung</h2>
+      <p class="hint">Booking langsung diproses tanpa tahap penawaran. Pilih driver (otomatis melekat dengan no. polisi, dan dapat diubah jika driver berhalangan hadir).</p>
+      <div class="row">
+        <label style="max-width:260px">Jenis Order<select id="f_jenis" onchange="renderRouteFields();refreshBkFleetAndAssign()">
+          <option value="Import" ${defJenis == 'Import' ? 'selected' : ''}>1. Import (Terminal → Tujuan → Depo Empty)</option>
+          <option value="Export" ${defJenis == 'Export' ? 'selected' : ''}>2. Export (Depo Empty → Tujuan → Terminal)</option>
+          <option value="Repo" ${defJenis == 'Repo' ? 'selected' : ''}>3. Repo Container (Terminal ↔ Depo Empty)</option>
+        </select></label>
+        <label>Customer / Pemilik Order<input id="f_cust" list="lc" oninput="fs()">${dl('lc', M.custs)}</label>
+        <label style="max-width:160px">Tanggal muat<input type="date" id="f_tgl" value="${defTgl}" onchange="refreshBkFleetAndAssign()"></label>
+        <label style="max-width:160px">Tipe trailer<select id="f_tipe" onchange="fs()">${TIPE.map(t => `<option>${t}</option>`).join('')}</select></label>
+      </div>
+
+      <div class="route-box" style="margin-top:10px">
+        <div class="route-flow">Sumber Order (Opsional)</div>
+        <div class="row">
+          <label>Nama PIC Sumber Order<input id="f_src_nama" placeholder="Opsional"></label>
+          <label>No. Telepon / WA<input id="f_src_telp" placeholder="Opsional"></label>
+          <label>Perusahaan / Asal Order<input id="f_src_pt" placeholder="Opsional"></label>
+        </div>
+      </div>
+
+      <div id="f_route_wrap" class="route-box"></div>
+
+      <div class="route-box" style="margin-top:10px">
+        <div class="route-flow">Penugasan Driver & No. Polisi (Bisa Diedit Jika Driver Berhalangan Hadir)</div>
+        <div class="row">
+          <label>Driver<span id="bk_drv_wrap">${buildDriverSelectHtml('f_drv', preDrv, defTgl, defJenis)}</span></label>
+          <label>No. Polisi Unit<span id="bk_trk_wrap">${buildTruckSelectHtml('f_trk', preTrk, defTgl, defJenis)}</span></label>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <label>No. container / muatan<input id="f_cont"></label>
+        <label>No. seal / BL<input id="f_seal"></label>
+        <label style="max-width:120px">Berat (ton)<input type="number" min="0" step="0.1" id="f_ton"></label>
+      </div>
+
+      <div class="pbox" style="margin-top:10px">
+        <b>Lampiran File Gatepass / Bon Muat Depo (PDF atau Foto — Opsional)</b>
+        <input type="file" accept="application/pdf,image/*" style="margin-top:6px" onchange="handleBkDocUpload(this)">
+        <div class="hint" id="bk_doc_status">Format didukung: PDF (maks 4 MB) atau Foto (JPG/PNG). Driver dapat membuka & mengunduh file ini.</div>
+      </div>
+
+      <label style="margin-top:10px">Catatan operasional<textarea id="f_cat" rows="2"></textarea></label>
+      <p class="hint" id="f_sg"></p>
+      <div id="bk_fleet_panel" class="route-box" style="margin-top:10px"></div>
+      <div class="row" style="margin-top:12px">
+        <button class="b" onclick="saveBk(false)">Simpan Booking</button>
+        <button class="b o" onclick="saveBk(true)">Simpan & Dispatch Langsung</button>
+        <button class="b g" onclick="closeM()">Batal</button>
+      </div>`);
+
+      renderRouteFields();
+      refreshBkFleetAndAssign();
+    }
+
+    async function handleBkDocUpload(el) {
+      const file = el.files && el.files[0];
+      if (!file) return;
+      if ($('bk_doc_status')) $('bk_doc_status').textContent = 'Memproses lampiran...';
+      try {
+        tmpBkDoc = await readAttachedFile(file);
+        if ($('bk_doc_status')) $('bk_doc_status').innerHTML = `<span class="ok">✓ Terlampir: <b>${E(tmpBkDoc.name)}</b> (${tmpBkDoc.sizeKb} KB)</span>`;
+      } catch (e) {
+        tmpBkDoc = null;
+        if ($('bk_doc_status')) $('bk_doc_status').innerHTML = `<span class="bad">${E(e.message)}</span>`;
+      }
+    }
+
+    function onBkDriverChange() {
+      const drvId = $('f_drv') ? $('f_drv').value : '';
+      const tgl = $('f_tgl') ? $('f_tgl').value : today();
+      const jenis = $('f_jenis') ? $('f_jenis').value : 'Import';
+      if (drvId) {
+        const d = drvObj(drvId);
+        if (d && d.plat && !busy('trk', d.plat, tgl, '', jenis)) {
+          $('bk_trk_wrap').innerHTML = buildTruckSelectHtml('f_trk', d.plat, tgl, jenis);
+        }
+      }
+    }
+
+    function refreshBkFleetAndAssign() {
+      const tgl = $('f_tgl') ? $('f_tgl').value : today();
+      const jenis = $('f_jenis') ? $('f_jenis').value : 'Import';
+      const curDrv = $('f_drv') ? $('f_drv').value : '';
+      const curTrk = $('f_trk') ? $('f_trk').value : '';
+      if ($('bk_drv_wrap')) $('bk_drv_wrap').innerHTML = buildDriverSelectHtml('f_drv', curDrv, tgl, jenis);
+      if ($('bk_trk_wrap')) $('bk_trk_wrap').innerHTML = buildTruckSelectHtml('f_trk', curTrk, tgl, jenis);
+
+      const { activeList, standbyList } = getFleetStatus(tgl);
+      if ($('bk_fleet_panel')) {
+        $('bk_fleet_panel').innerHTML = `<div class="route-flow">Ketersediaan Armada & Prediksi Waktu (${E(tgl)}) · ${jenis === 'Repo' ? '<span class="ok">Repo Container: boleh tugaskan armada aktif di hari yang sama</span>' : 'Hanya unit bebas tugas yang dapat dipilih'}</div>
+        <div class="hint" style="margin-bottom:6px"><b>Standby / Belum Menerima Order (${standbyList.length}):</b> ${standbyList.length ? standbyList.map(s => `<span style="display:inline-flex;align-items:center;gap:4px;margin-right:8px"><b>${E(s.plat)}</b> (${E(s.drvName)} · ${E(s.state)}) <button type="button" class="b s g" onclick="applyFleetToBk('${E(s.drvId)}','${E(s.plat)}')">Pilih</button></span>`).join('') : 'Tidak ada unit standby.'}</div>
+        <div class="hint"><b>Sedang Menjalankan Order (${activeList.length}):</b> ${activeList.length ? activeList.map(a => `<span style="display:inline-flex;align-items:center;gap:4px;margin-right:8px"><b>${E(a.trk)}</b> (${E(a.drvName)} · ${E(a.spk)} · mulai ${E(a.acceptedAt !== '-' ? a.acceptedAt : a.dispatchedAt)} · est. selesai <b>~${E(a.estFinish)}</b>)${jenis === 'Repo' ? ` <button type="button" class="b s o" onclick="applyFleetToBk('${E(a.drvId)}','${E(a.trk)}')">+ Repo</button>` : ''}</span>`).join('') : 'Tidak ada armada aktif.'}</div>`;
+      }
+      fs();
+    }
+
+    function applyFleetToBk(drvId, plat) {
+      const tgl = $('f_tgl') ? $('f_tgl').value : today();
+      const jenis = $('f_jenis') ? $('f_jenis').value : 'Import';
+      if (drvId && $('bk_drv_wrap')) $('bk_drv_wrap').innerHTML = buildDriverSelectHtml('f_drv', drvId, tgl, jenis);
+      if (plat && $('bk_trk_wrap')) $('bk_trk_wrap').innerHTML = buildTruckSelectHtml('f_trk', plat, tgl, jenis);
+      showToast(`Unit ${plat || '-'} dipilih untuk booking ini.`);
+    }
+
+    function renderRouteFields() {
+      const j = $('f_jenis').value;
+      const curTerm = $('f_term') ? $('f_term').value : '';
+      const curT = $('f_t') ? $('f_t').value : '';
+      const curDepo = $('f_depo') ? $('f_depo').value : '';
+      const curDir = $('f_repoDir') ? $('f_repoDir').value : 'T2D';
+      const terms = M.routes.map(r => r.term), tujs = M.routes.map(r => r.t), depos = M.routes.map(r => r.depo);
+
+      if (j === 'Repo') {
+        $('f_route_wrap').innerHTML = `<div class="route-flow">Alur Rute REPO CONTAINER (Bisa ditugaskan sebagai order lanjutan di hari yang sama)</div>
+        <div class="row">
+          <label style="max-width:230px">Arah Repo<select id="f_repoDir" onchange="fs()">
+            <option value="T2D" ${curDir == 'T2D' ? 'selected' : ''}>A. Terminal → Depo Empty</option>
+            <option value="D2T" ${curDir == 'D2T' ? 'selected' : ''}>B. Depo Empty → Terminal</option>
+          </select></label>
+          <label>Lokasi Terminal<input id="f_term" list="lterm" value="${E(curTerm)}" placeholder="Terminal JICT, Tanjung Priok" oninput="fs()">${dl('lterm', terms)}</label>
+          <label>Lokasi Depo Empty<input id="f_depo" list="ldepo" value="${E(curDepo)}" placeholder="Depo Marunda Empty" oninput="fs()">${dl('ldepo', depos)}</label>
+        </div>`;
+      } else {
+        const fTerm = `<label>${j == 'Import' ? '1. Terminal (Asal Muat)' : '3. Terminal (Tujuan Akhir)'}<input id="f_term" list="lterm" value="${E(curTerm)}" placeholder="Terminal JICT, Tanjung Priok" oninput="fs()">${dl('lterm', terms)}</label>`;
+        const fTuj = `<label>2. Alamat Tujuan (Gudang)<input id="f_t" list="lt" value="${E(curT)}" placeholder="Kawasan Industri Cikarang" oninput="fs()">${dl('lt', tujs)}</label>`;
+        const fDepo = `<label>${j == 'Import' ? '3. Depo Empty (Pengembalian)' : '1. Depo Empty (Ambil Kosong)'}<input id="f_depo" list="ldepo" value="${E(curDepo)}" placeholder="Depo Marunda Empty" oninput="fs()">${dl('ldepo', depos)}</label>`;
+        $('f_route_wrap').innerHTML = j == 'Import'
+          ? `<div class="route-flow">Alur Rute IMPORT: Terminal → Alamat Tujuan → Depo Empty</div><div class="row">${fTerm}${fTuj}${fDepo}</div>`
+          : `<div class="route-flow">Alur Rute EXPORT: Depo Empty → Alamat Tujuan → Terminal</div><div class="row">${fDepo}${fTuj}${fTerm}</div>`;
+      }
+      fs();
+    }
+
+    function fs() {
+      if (!$('f_jenis') || !$('f_term') || !$('f_depo') || !$('f_sg')) return;
+      const j = $('f_jenis').value, term = $('f_term').value.trim(), depo = $('f_depo').value.trim();
+      const t = j === 'Repo' ? 'Repo Container' : ($('f_t') ? $('f_t').value.trim() : '');
+      const repoDir = $('f_repoDir') ? $('f_repoDir').value : 'T2D';
+      const r = rt(j, term, t, depo, repoDir), i = TIPE.indexOf($('f_tipe').value);
+      if (r) {
+        if (!depo && r.depo) $('f_depo').value = r.depo;
+        if (!term && r.term) $('f_term').value = r.term;
+        $('f_sg').innerHTML = `Tarif master <b>${jLabel(j)}</b> ditemukan: ongkos <b>${R(r.c[i])}</b>, uang jalan driver <b>${R(r.u[i])}</b>.`;
+      } else {
+        $('f_sg').innerHTML = `Rute <b>${jLabel(j)}</b> belum ada di master. Isi ongkos & uang jalan setelah simpan; otomatis terekam ke master.`;
+      }
+    }
+
+    function nextSpk() {
+      const d = today(), p = 'SPK-' + d.slice(2, 4) + d.slice(5, 7) + '-';
+      const n = Math.max(0, ...Object.keys(O).filter(k => k.startsWith(p)).map(k => +k.slice(p.length) || 0));
+      return p + String(n + 1).padStart(3, '0');
+    }
+
+    function saveBk(directDispatch = false) {
+      const v = k => $('f_' + k) ? $('f_' + k).value.trim() : '';
+      const jenis = v('jenis'), cust = v('cust'), term = v('term'), depo = v('depo'), repoDir = v('repoDir') || 'T2D';
+      const t = jenis === 'Repo' ? 'Repo Container' : v('t');
+      const drv = v('drv');
+      let trk = v('trk');
+      const tgl = v('tgl');
+
+      if (!cust || !term || !depo || (jenis !== 'Repo' && !t)) {
+        return showToast('Lengkapi Customer dan seluruh titik rute.');
+      }
+      if (!trk && drv) {
+        const dObj = drvObj(drv);
+        if (dObj) trk = dObj.plat;
+      }
+      if (directDispatch && (!drv || !trk)) {
+        return showToast('Pilih Driver dan No. Polisi sebelum Dispatch langsung.');
+      }
+      if (busy('drv', drv, tgl, '', jenis) || busy('trk', trk, tgl, '', jenis)) {
+        return showToast('Driver atau unit sudah dipakai order lain di tanggal itu (kecuali Repo Container).');
+      }
+
+      const tipe = v('tipe'), i = TIPE.indexOf(tipe), r = rt(jenis, term, t, depo, repoDir);
+      const ruteLabel = jenis === 'Repo' ? (repoDir === 'D2T' ? `${depo} – ${term}` : `${term} – ${depo}`) : (jenis == 'Export' ? `${depo} – ${t} – ${term}` : `${term} – ${t} – ${depo}`);
+      const ts = nowWib();
+
+      const o = {
+        spk: nextSpk(), jenis, repoDir: jenis === 'Repo' ? repoDir : '',
+        tgl, createdAt: ts,
+        dispatchedAt: directDispatch ? ts : '',
+        cust,
+        srcOrder: { nama: v('src_nama'), telp: v('src_telp'), perusahaan: v('src_pt') },
+        a: (jenis == 'Export' || (jenis == 'Repo' && repoDir == 'D2T')) ? depo : term,
+        term, t, depo, tipe, cont: v('cont'), seal: v('seal'), ton: v('ton'), cat: v('cat'),
+        st: directDispatch ? 'Dispatch' : 'Booking',
+        items: [{ n: `Ongkos angkut [${jLabel(jenis)}] ${tipe} (${ruteLabel})`, q: 1, p: r ? r.c[i] : 0 }],
+        discType: 'rp', discVal: 0, komisi: 0, ppn: true, pph: false,
+        uj: r ? r.u[i] : 0, drv, trk, accepted: false,
+        docs: { term: { lokasi: term }, depo: { lokasi: depo } },
+        gatepassDoc: tmpBkDoc ? cl(tmpBkDoc) : null,
+        photos: {}, drvCond: 'Lancar', drvReport: '', pod: '', tiba: '', drvStep: '', seen: false
+      };
+
+      if (!M.custs.includes(o.cust)) M.custs.push(o.cust);
+      M.custList = M.custList || [];
+      if (!M.custList.some(x => x.n.toLowerCase() === o.cust.toLowerCase())) {
+        M.custList.push({ n: o.cust, al: t || depo });
+      }
+      if (!r) M.routes.push({ jenis, repoDir: o.repoDir, term, t, depo, c: [0, 0, 0, 0], u: [0, 0, 0, 0] });
+      pm(); po(o); tmpBkDoc = null;
+      closeM();
+      openO(o.spk);
+      showToast(directDispatch ? `Order ${o.spk} berhasil di-dispatch!` : `Booking ${o.spk} tersimpan.`);
+    }
+
+    function sync(o) {
+      const j = o.jenis || 'Import', term = o.term || o.a || '', t = o.t || '', depo = o.depo || '', repoDir = o.repoDir || 'T2D';
+      let r = rt(j, term, t, depo, repoDir);
+      if (!r) { r = { jenis: j, repoDir: j === 'Repo' ? repoDir : '', term, t, depo, c: [0, 0, 0, 0], u: [0, 0, 0, 0] }; M.routes.push(r); }
+      const i = TIPE.indexOf(o.tipe);
+      if (o.items[0] && o.items[0].p > 0) r.c[i] = o.items[0].p;
+      if (o.uj > 0) r.u[i] = o.uj;
+      pm();
+    }
+
+    const gO = n => O[n];
+
+    /* =========================================================================
+       DETAIL SPK & PENGGANTIAN DRIVER / NO. POLISI
+       ========================================================================= */
+    function openO(n) {
+      const o = gO(n), j = o.jenis || 'Import', i = ST.indexOf(o.st), bt = o.st == 'Batal';
+      const canEdit = isSA() || o.st === 'Booking';
+      const canAssign = isSA() || ['Booking', 'Dispatch'].includes(o.st);
+      const r = rt(j, o.term || o.a, o.t, o.depo, o.repoDir), sg = r ? r.u[TIPE.indexOf(o.tipe)] : 0, ph = o.photos || {};
+      const srcTxt = fmtSrcOrder(o);
+
+      modal(`<div class="row"><h2 style="margin:0">${E(o.spk)} · <span class="tag ${jClass(j)}">${E(jLabel(j))}</span> · ${E(o.cust)}</h2><button class="b g s" style="margin-left:auto" onclick="closeM()">Tutup</button></div>
+      <div class="hint" style="margin-bottom:6px">Dibuat: <b>${E(o.createdAt || o.tgl)}</b>${o.dispatchedAt ? ` · Dispatch: <b>${E(o.dispatchedAt)}</b>` : ''}${o.acceptedAt ? ` · Diterima Driver: <b>${E(o.acceptedAt)}</b>` : ''}${o.finishedAt ? ` · Selesai: <b>${E(o.finishedAt)}</b>` : ''}</div>
+      ${bt ? `<p class="bad"><b>Order dibatalkan.</b> ${E(o.alasan || '')}</p>` : `<div class="pipe">${ST.map((s, k) => `<span class="${k < i ? 'd' : k == i ? 'c' : ''}">${s}</span>`).join('')}</div>`}
+      <p><b>Alur Rute (${E(jLabel(j))}):</b> ${E(fmtRute(o))}<br>
+      Tipe: <b>${E(o.tipe)}</b> · Muat: <b>${E(o.tgl)}</b>${o.cont ? ' · Container: ' + E(o.cont) : ''}${o.seal ? ' · Seal: ' + E(o.seal) : ''}${o.ton ? ' · ' + E(o.ton) + ' ton' : ''}<br>
+      Sumber Order: <b>${E(srcTxt)}</b>${o.cat ? '<br>Catatan Admin: ' + E(o.cat) : ''}</p>
+      ${renderDocAttachmentBlock(o, false)}
+
+      <h3>Penawaran ongkos</h3>
+      <div class="tw"><table>
+        <tr><th>Deskripsi biaya</th><th class="n" style="width:70px">Qty</th><th class="n" style="width:150px">Harga satuan</th><th class="n">Jumlah</th><th></th></tr>
+        ${o.items.map((it, k) => `<tr>
+          <td><input ${canEdit ? '' : 'disabled'} value="${E(it.n)}" onchange="uI('${E(n)}',${k},'n',this.value)"></td>
+          <td><input type="number" min="0" ${canEdit ? '' : 'disabled'} value="${it.q}" onchange="uI('${E(n)}',${k},'q',this.value)"></td>
+          <td><input type="number" min="0" ${canEdit ? '' : 'disabled'} value="${it.p}" onchange="uI('${E(n)}',${k},'p',this.value)"></td>
+          <td class="n">${R(it.q * it.p)}</td>
+          <td>${canEdit && k ? `<button class="b s r" onclick="dI('${E(n)}',${k})">×</button>` : ''}</td>
+        </tr>`).join('')}
+      </table></div>
+      ${canEdit ? `<div class="row" style="margin-top:8px">
+        <select id="ex" style="max-width:250px">
+          <option value="Biaya tambahan|0">Tambah biaya lain…</option>
+          <option value="Biaya lift on / lift off|350000">Lift on/off</option>
+          <option value="Biaya THC / storage pelabuhan|500000">THC / storage</option>
+          <option value="Biaya tol|0">Tol</option>
+          <option value="Multi drop (per titik)|250000">Multi drop</option>
+          <option value="Biaya bongkar muat|400000">Bongkar muat</option>
+          <option value="Demurrage / waktu tunggu|300000">Waktu tunggu / inap</option>
+        </select>
+        <button class="b g s" onclick="aI('${E(n)}')">+ Tambah baris</button>
+      </div>` : ''}
+
+      <div class="row" style="margin-top:10px">
+        <label style="max-width:130px">Diskon<select ${canEdit ? '' : 'disabled'} onchange="uF('${E(n)}','discType',this.value)"><option value="rp" ${(o.discType || 'rp') == 'rp' ? 'selected' : ''}>Potongan Rp</option><option value="pct" ${o.discType == 'pct' ? 'selected' : ''}>Persen (%)</option></select></label>
+        <label style="max-width:130px">Nilai Diskon<input type="number" min="0" ${canEdit ? '' : 'disabled'} value="${o.discVal || 0}" onchange="uF('${E(n)}','discVal',Math.max(0,+this.value||0))"></label>
+        <label style="max-width:150px">Komisi SPK (Rp)<input type="number" min="0" ${canEdit ? '' : 'disabled'} value="${o.komisi || 0}" onchange="uF('${E(n)}','komisi',Math.max(0,+this.value||0))"></label>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <label style="flex:0;min-width:auto;flex-direction:row;align-items:center"><input type="checkbox" style="width:auto" ${o.ppn ? 'checked' : ''} ${canEdit ? '' : 'disabled'} onchange="tg('${E(n)}','ppn',this.checked)"> PPN ${M.set.ppn}%</label>
+        <label style="flex:0;min-width:auto;flex-direction:row;align-items:center;white-space:nowrap"><input type="checkbox" style="width:auto" ${o.pph ? 'checked' : ''} ${canEdit ? '' : 'disabled'} onchange="tg('${E(n)}','pph',this.checked)"> PPh 23 ${M.set.pph}%</label>
+        <div class="tot">
+          <div><span>Subtotal</span><span>${R(grossSub(o))}</span></div>
+          ${discAmt(o) ? `<div><span>Diskon</span><span>− ${R(discAmt(o))}</span></div>` : ''}
+          <div><span>PPN</span><span>${R(ppn(o))}</span></div>
+          ${o.pph ? `<div><span>PPh 23</span><span>− ${R(pph(o))}</span></div>` : ''}
+          <div class="g"><span>Total tagihan</span><span>${R(tot(o))}</span></div>
+        </div>
+      </div>
+
+      <h3>Dispatch, Penggantian Driver / No. Polisi & Uang Jalan</h3>
+      <div class="row">
+        <label>Driver (Melekat No. Polisi)
+          <select ${canAssign ? '' : 'disabled'} onchange="uF('${E(n)}','drv',this.value)">
+            <option value="">– pilih driver –</option>
+            ${M.drivers.map(d => {
+              const b = busy('drv', d.id, o.tgl, o.spk, j);
+              return `<option value="${E(d.id)}" ${o.drv == d.id ? 'selected' : ''} ${b ? 'disabled' : ''}>${E(d.n)} (${E(d.plat)})${b ? ' — sedang ' + b.spk : ''}</option>`;
+            }).join('')}
+          </select>
+        </label>
+        <label>No. Polisi Unit
+          <select ${canAssign ? '' : 'disabled'} onchange="uF('${E(n)}','trk',this.value)">
+            <option value="">– pilih no. polisi –</option>
+            ${M.trucks.map(t => {
+              const b = busy('trk', t.plat, o.tgl, o.spk, j);
+              return `<option value="${E(t.plat)}" ${o.trk == t.plat ? 'selected' : ''} ${b ? 'disabled' : ''}>${E(t.plat)} (${E(t.jenis)})${b ? ' — sedang ' + b.spk : ''}</option>`;
+            }).join('')}
+          </select>
+        </label>
+        <label>Uang jalan driver (Rp / trip)<input type="number" min="0" ${canAssign ? '' : 'disabled'} value="${o.uj}" onchange="uF('${E(n)}','uj',Math.max(0,+this.value||0))"></label>
+      </div>
+      <p class="hint">Saran master (${E(jLabel(j))}): <b>${R(sg)}</b>. ${canAssign ? `<a href="#" onclick="uF('${E(n)}','uj',${sg});return false">Terapkan saran</a> · ` : ''}Jika driver berhalangan hadir, ubah pilihan Driver/No. Polisi di atas. ${j === 'Repo' ? '<b class="ok">Mode Repo Container:</b> Bisa diberikan sebagai order lanjutan di hari yang sama.' : ''}</p>
+
+      ${i >= 2 ? `<h3>Bukti Penyelesaian & Laporan Lapangan Driver</h3>
+      <div class="drv-rep ${hasIssue(o) ? 'warn' : ''}">
+        <div><b>Situasi Bongkar / Muat:</b> <span class="tag" style="${hasIssue(o) ? 'background:var(--bad);color:#fff' : 'background:var(--ok);color:#fff'}">${E(o.drvCond || 'Lancar')}</span> · Tiba: <b>${E(o.tiba || '-')}</b> · Selesai: <b>${E(o.finishedAt || o.completedAt || '-')}</b></div>
+        <div style="margin-top:6px"><b>Catatan / Kendala Driver:</b> ${o.drvReport ? E(o.drvReport) : '<span class="hint">Tidak ada catatan kendala khusus dari driver.</span>'}</div>
+      </div>
+      ${(ph.pod || ph.seal) ? `<div class="pgrid">
+        ${ph.pod ? `<div class="pitem"><b>Foto Surat Jalan / POD</b><img src="${ph.pod}" onclick="viewPhoto('${E(n)}','pod')" title="Klik untuk memperbesar"></div>` : ''}
+        ${ph.seal ? `<div class="pitem"><b>Foto Segel / Container</b><img src="${ph.seal}" onclick="viewPhoto('${E(n)}','seal')" title="Klik untuk memperbesar"></div>` : ''}
+      </div>` : ''}` : ''}
+
+      <div class="row" style="margin-top:14px">
+        ${o.st === 'Booking' ? `<button class="b o" onclick="adv('${E(n)}')">Dispatch ke driver →</button>` : ''}
+        ${o.st === 'Dispatch' && isSA() ? `<button class="b g" onclick="fin('${E(n)}')">Tandai selesai (override superadmin)</button>` : ''}
+        ${i >= 0 && i < 2 ? `<input id="rs" placeholder="Alasan batal" style="max-width:200px"><button class="b r" onclick="cancelO('${E(n)}')">Batalkan order</button>` : ''}
+        ${isSA() ? `<button class="b r" onclick="delO('${E(n)}')">Hapus (superadmin)</button>` : ''}
+      </div>`);
+    }
+
+    function uF(n, k, v) {
+      const o = gO(n);
+      o[k] = v;
+      if (k == 'drv') {
+        const d = drvObj(v);
+        if (d && d.plat && !busy('trk', d.plat, o.tgl, o.spk, o.jenis)) o.trk = d.plat;
+        if (o.st === 'Dispatch') { o.seen = false; o.accepted = false; }
+      }
+      po(o);
+      openO(n);
+      if (k == 'drv' || k == 'trk') showToast('Penugasan driver & no. polisi diperbarui.');
+    }
+
+    function uI(n, k, f, v) { const o = gO(n); o.items[k][f] = f == 'n' ? v : Math.max(0, +v || 0); po(o); if (f != 'n') openO(n); }
+    function dI(n, k) { const o = gO(n); o.items.splice(k, 1); po(o); openO(n); }
+    function aI(n) { const [a, b] = $('ex').value.split('|'), o = gO(n); o.items.push({ n: a, q: 1, p: +b }); po(o); openO(n); }
+    function tg(n, k, v) { const o = gO(n); o[k] = v; po(o); openO(n); }
+
+    function adv(n) {
+      const o = gO(n);
+      if (o.st === 'Booking') {
+        if (!o.drv || !o.trk) return showToast('Pilih driver dan no. polisi unit dulu sebelum dispatch.');
+        if (busy('drv', o.drv, o.tgl, n, o.jenis) || busy('trk', o.trk, o.tgl, n, o.jenis)) {
+          return showToast('Driver atau unit sudah dipakai order lain di tanggal itu (kecuali Repo Container).');
+        }
+        sync(o);
+        o.seen = false;
+        o.accepted = false;
+        o.dispatchedAt = nowWib();
+        o.st = 'Dispatch';
+        po(o);
+        openO(n);
+        showToast(`Order ${n} berhasil di-dispatch ke ${drvN(o.drv)} (${o.trk}).`);
+      }
+    }
+
+    function fin(n) {
+      if (!isSA()) return;
+      const o = gO(n);
+      if (!o || o.st !== 'Dispatch') return;
+      const wib = getWibParts();
+      o.finishedAt = wib.full;
+      o.completedAt = o.completedAt || wib.full;
+      o.tiba = o.tiba || wib.iso;
+      o.drvStep = '';
+      o.drvCond = o.drvCond || 'Lancar';
+      o.drvReport = o.drvReport || 'Diselesaikan oleh Superadmin';
+      o.st = 'Selesai';
+      po(o);
+      openO(n);
+      showToast(`Order ${n} ditandai Selesai oleh Superadmin.`);
+    }
+
+    function cancelO(n) {
+      const o = gO(n), a = $('rs').value.trim();
+      if (!a) return showToast('Isi alasan batal.');
+      o.st = 'Batal'; o.alasan = a; o.canceledAt = nowWib();
+      po(o); closeM();
+      showToast(`Order ${n} dibatalkan.`);
+    }
+
+    function delO(n) {
+      if (!isSA()) return;
+      delete O[n];
+      lsSave();
+      if (useBackend && getApiToken()) {
+        apiReq('/api/orders/' + encodeURIComponent(n), { method: 'DELETE' }).catch(e => showToast('Sync hapus: ' + e.message));
+      }
+      closeM();
+      showToast(`Order ${n} dihapus permanen.`);
+    }
+
+    /* =========================================================================
+       UPLOAD DATA TERMINAL, DEPO & FILE GATEPASS / BON MUAT
+       ========================================================================= */
+    function upl() {
+      const L = ALL().filter(o => !['Batal', 'Ditagih'].includes(o.st)).sort((a, b) => a.tgl < b.tgl ? -1 : 1);
+      return `<div class="card">
+        <div class="row" style="margin-bottom:10px">
+          <h2 style="margin:0">Upload data Terminal, Depo Empty & Gatepass / Bon Muat</h2>
+          <div style="margin-left:auto">${exportBtnsHtml('upl')}</div>
+        </div>
+        <div class="tw"><table>
+          <tr><th>SPK</th><th>Jenis</th><th>Tgl</th><th>Alur Rute</th><th>Driver / Unit</th><th>Terminal</th><th>Depo Empty</th><th>File Gatepass</th><th></th></tr>
+          ${L.map(o => `<tr>
+            <td><b>${E(o.spk)}</b></td>
+            <td><span class="tag ${jClass(o.jenis)}">${E(jLabel(o.jenis))}</span></td>
+            <td>${E(o.tgl)}</td>
+            <td>${E(fmtRute(o))}</td>
+            <td>${E(drvN(o.drv))}<div class="hint">${E(o.trk || '-')}</div></td>
+            <td>${(o.docs.term && o.docs.term.lokasi) ? '<span class="ok">Terisi</span>' : '–'}</td>
+            <td>${(o.docs.depo && o.docs.depo.lokasi) ? '<span class="ok">Terisi</span>' : '–'}</td>
+            <td>${o.gatepassDoc ? `<span class="ok">📎 ${E(o.gatepassDoc.name)}</span>` : '<span class="hint">Belum ada</span>'}</td>
+            <td><button class="b s" onclick="ud('${E(o.spk)}')">Isi / Upload</button></td>
+          </tr>`).join('') || '<tr><td colspan="9" class="hint">Belum ada order.</td></tr>'}
+        </table></div>
+      </div>`;
+    }
+
+    const DF = [['lokasi', 'Nama lokasi'], ['alamat', 'Alamat'], ['jam', 'Jam / jadwal'], ['ref', 'No. referensi / DO'], ['cat', 'Catatan']];
+
+    function ud(n) {
+      const o = gO(n);
+      tmpUplDoc = o.gatepassDoc ? cl(o.gatepassDoc) : null;
+      const f = (k, t) => `<div class="tile ${k == 'depo' ? 't2' : ''}"><b>${t}</b>${DF.map(x => `<label>${x[1]}<input id="u_${k}_${x[0]}" value="${E((o.docs[k] || {})[x[0]] || '')}"></label>`).join('')}</div>`;
+      modal(`<h2>Data & File untuk driver · ${E(n)} (${E(jLabel(o.jenis))})</h2>
+      <p>${E(fmtRute(o))} · driver ${E(drvN(o.drv))} (${E(o.trk || '-')})</p>
+      <div class="row">${f('term', 'Terminal')}${f('depo', 'Depo Empty')}</div>
+      <div class="pbox" style="margin-top:12px">
+        <b>Lampiran File Gatepass / Bon Muat Depo (PDF atau Foto)</b>
+        <input type="file" accept="application/pdf,image/*" style="margin-top:6px" onchange="handleUplDocUpload(this)">
+        <div class="hint" id="upl_doc_status">${tmpUplDoc ? `<span class="ok">✓ File aktif: <b>${E(tmpUplDoc.name)}</b> (${tmpUplDoc.sizeKb || 0} KB)</span>` : 'Pilih file PDF atau Foto untuk dikirim ke driver.'}</div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button class="b" onclick="su('${E(n)}')">Simpan & kirim ke driver</button>
+        <button class="b g" onclick="closeM()">Batal</button>
+      </div>`);
+    }
+
+    async function handleUplDocUpload(el) {
+      const file = el.files && el.files[0];
+      if (!file) return;
+      try {
+        tmpUplDoc = await readAttachedFile(file);
+        if ($('upl_doc_status')) $('upl_doc_status').innerHTML = `<span class="ok">✓ File siap dikirim: <b>${E(tmpUplDoc.name)}</b> (${tmpUplDoc.sizeKb || 0} KB)</span>`;
+      } catch (e) {
+        if ($('upl_doc_status')) $('upl_doc_status').innerHTML = `<span class="bad">${E(e.message)}</span>`;
+      }
+    }
+
+    function su(n) {
+      const o = gO(n);
+      o.docs = o.docs || {};
+      ['term', 'depo'].forEach(k => {
+        const d = {};
+        let any = 0;
+        DF.forEach(x => { d[x[0]] = $('u_' + k + '_' + x[0]).value.trim(); if (d[x[0]]) any = 1; });
+        if (any) o.docs[k] = d;
+        else delete o.docs[k];
+      });
+      if (tmpUplDoc) o.gatepassDoc = cl(tmpUplDoc);
+      tmpUplDoc = null;
+      o.seen = false;
+      po(o);
+      closeM();
+      showToast(`Data & file untuk ${n} dikirim ke driver.`);
+    }
+
+    /* =========================================================================
+       MAINTENANCE (TERMASUK KATEGORI BIAYA LAINNYA)
+       ========================================================================= */
+    function mnt() {
+      const list = (M.expenses || []).sort((a, b) => (b.waktu || b.tgl).localeCompare(a.waktu || a.tgl));
+      return `<div class="card">
+        <div class="row" style="margin-bottom:8px">
+          <div>
+            <h2 style="margin:0">Perbaikan Mobil, Maintenance, Sparepart & Biaya Lainnya</h2>
+            <div class="hint">Setiap pengeluaran otomatis memotong saldo <b>Top-Up Token Operasional</b> dari Kasir serta masuk ke beban operasional.</div>
+          </div>
+          <div style="margin-left:auto">${exportBtnsHtml('mnt')}</div>
+        </div>
+        <div class="row" style="margin-bottom:12px">
+          <label style="max-width:150px">Tanggal<input type="date" id="m_tgl" value="${today()}"></label>
+          <label style="max-width:150px">Unit Truk<select id="m_trk"><option value="UMUM">Umum / Bengkel</option>${M.trucks.map(t => `<option value="${E(t.plat)}">${E(t.plat)}</option>`).join('')}</select></label>
+          <label style="max-width:185px">Kategori<select id="m_kat">
+            <option>Perbaikan / Servis</option>
+            <option>Pembelian Sparepart</option>
+            <option>Ban & Vulkanisir</option>
+            <option>Ganti Oli & Filter</option>
+            <option>KIR / Pajak / STNK</option>
+            <option>Biaya Lainnya</option>
+          </select></label>
+          <label style="flex:2;min-width:180px">Rincian Pengeluaran<input id="m_ket" placeholder="Contoh: Ganti kampas rem / biaya bongkar darurat"></label>
+          <label style="max-width:150px">Biaya (Rp)<input type="number" min="0" id="m_nom"></label>
+          <button class="b o" onclick="addMnt()">+ Tambah</button>
+        </div>
+        <div class="tw"><table>
+          <tr><th>Waktu Input (WIB)</th><th>Unit</th><th>Kategori</th><th>Rincian</th><th class="n">Biaya</th><th></th></tr>
+          ${list.map(e => `<tr>
+            <td>${E(e.waktu || e.tgl)}</td>
+            <td><b>${E(e.trk)}</b></td>
+            <td><span class="tag">${E(e.kat)}</span></td>
+            <td>${E(e.ket)}</td>
+            <td class="n">${R(e.nom)}</td>
+            <td>${isSA() ? `<button class="b s r" onclick="delMnt('${E(e.id)}')">Hapus</button>` : '<span class="hint">Terkunci</span>'}</td>
+          </tr>`).join('') || '<tr><td colspan="6" class="hint">Belum ada catatan maintenance.</td></tr>'}
+        </table></div>
+      </div>`;
+    }
+
+    function addMnt() {
+      const tgl = $('m_tgl').value, trk = $('m_trk').value, kat = $('m_kat').value;
+      const ket = $('m_ket').value.trim(), nom = Math.max(0, +$('m_nom').value || 0);
+      if (!ket || !nom) return showToast('Lengkapi rincian dan nominal biaya.');
+      M.expenses = M.expenses || [];
+      M.expenses.push({ id: 'EX' + Date.now(), tgl, waktu: nowWib(), trk, kat, ket, nom, oleh: me.n });
+      pm(); rr();
+      showToast('Catatan pengeluaran tersimpan.');
+    }
+
+    function delMnt(id) {
+      if (!isSA()) return;
+      M.expenses = M.expenses.filter(x => x.id != id);
+      pm(); rr();
+      showToast('Data pengeluaran dihapus.');
+    }
+
+    /* =========================================================================
+       MENU DRIVER: ANTREAN BERURUTAN, LIHAT/DOWNLOAD FILE & ALUR 3 TAHAP
+       ========================================================================= */
+    function drv() {
+      const A = ALL().filter(o => o.drv == me.id);
+      const run = byD(A.filter(o => o.st == 'Dispatch'));
+      const dn = A.filter(o => ['Selesai', 'Ditagih'].includes(o.st))
+        .sort((a, b) => (b.finishedAt || b.completedAt || b.tiba || '').localeCompare(a.finishedAt || a.completedAt || a.tiba || ''))
+        .slice(0, 8);
+
+      const T = (o, k, t, c) => {
+        const d = o.docs[k];
+        return `<div class="tile ${c}"><b>${t}</b>${d ? `${E(d.lokasi)}<br>${E(d.alamat || '')}<br>Jam: ${E(d.jam || '-')} · Ref: ${E(d.ref || '-')}${d.cat ? '<br>' + E(d.cat) : ''}` : '<span class="hint">Belum ada data.</span>'}</div>`;
+      };
+
+      const renderWizard = o => {
+        const step = o.drvStep || 'upload';
+        const isUpload = step === 'upload';
+        const ph = o.photos || {};
+        return `<div class="dc wizard">
+          <div class="row">
+            <b>${E(o.spk)}</b>
+            <span class="tag ${jClass(o.jenis)}">${E(jLabel(o.jenis))}</span>
+            <span class="tag st-Dispatch">Proses Penyelesaian Order</span>
+            <span class="hint" style="margin-left:auto">Waktu Selesai Terekam: <b>${E(o.completedAt || '-')}</b></span>
+          </div>
+          <div class="step-bar">
+            <div class="done">1. Waktu Selesai Terekam (${E((o.completedAt || '').slice(11, 19) || 'WIB')})</div>
+            <div class="${isUpload ? 'act' : 'done'}">2. Upload Foto Surat Jalan / POD</div>
+            <div class="${!isUpload ? 'act' : ''}">3. Catatan & Report Admin</div>
+          </div>
+          ${isUpload ? `
+            <h3>Tahap 2: Upload Foto Surat Jalan / POD</h3>
+            <p class="hint">Unggah atau ambil foto Surat Jalan / POD untuk order <b>${E(o.spk)}</b> (${E(o.cust)}). Setelah tersimpan, sistem otomatis lanjut ke catatan admin.</p>
+            <div class="pbox" style="max-width:420px">
+              <b>Foto Surat Jalan / POD</b>
+              <input type="file" accept="image/*" capture="environment" style="margin-top:6px" onchange="handleDrvStepPhoto(this,'${E(o.spk)}')">
+              <div class="hint" id="drv_st_pod">${ph.pod ? '<span class="ok">✓ Foto POD sudah siap</span>' : 'Ambil foto langsung atau pilih dari galeri'}</div>
+              <img id="drv_pv_pod" src="${ph.pod || ''}" style="display:${ph.pod ? 'block' : 'none'}">
+            </div>
+            <div class="row" style="margin-top:12px">
+              <button class="b o" onclick="saveDriverUploadStep('${E(o.spk)}')">Lanjut ke Catatan Admin →</button>
+              <button class="b g" onclick="cancelFinishWizard('${E(o.spk)}')">Batalkan Selesai</button>
+            </div>
+          ` : `
+            <h3>Tahap 3: Catatan Situasi Bongkar / Muat & Kendala untuk Admin</h3>
+            <p class="hint">Lengkapi situasi bongkar/muat dan catatan kendala untuk order <b>${E(o.spk)}</b>.</p>
+            <div class="row">
+              <label style="max-width:270px">Situasi Bongkar / Muat<select id="drv_cond_${E(o.spk)}" onchange="onDrvCondChange('${E(o.spk)}')">
+                <option value="Lancar" ${(o.drvCond || 'Lancar') == 'Lancar' ? 'selected' : ''}>✅ Lancar / Tanpa Kendala</option>
+                <option value="Antre Panjang di Terminal / Depo" ${o.drvCond == 'Antre Panjang di Terminal / Depo' ? 'selected' : ''}>⚠️ Antre Panjang di Terminal / Depo</option>
+                <option value="Gudang Bongkar / Muat Padat" ${o.drvCond == 'Gudang Bongkar / Muat Padat' ? 'selected' : ''}>⚠️ Gudang Bongkar / Muat Padat</option>
+                <option value="Kendala Dokumen / Seal / DO" ${o.drvCond == 'Kendala Dokumen / Seal / DO' ? 'selected' : ''}>⚠️ Kendala Dokumen / Seal / DO</option>
+                <option value="Kendala Teknis Unit / Jalan" ${o.drvCond == 'Kendala Teknis Unit / Jalan' ? 'selected' : ''}>🚨 Kendala Teknis Unit / Jalan</option>
+                <option value="Lainnya" ${o.drvCond == 'Lainnya' ? 'selected' : ''}>⚠️ Kendala Lainnya</option>
+              </select></label>
+              <label style="flex:2;min-width:240px">Catatan Situasi Bongkar / Muat & Kendala<textarea id="drv_rep_${E(o.spk)}" rows="2" placeholder="Tuliskan situasi bongkar/muat atau kendala di lapangan...">${E(o.drvReport || '')}</textarea></label>
+            </div>
+            <p class="hint" id="drv_rep_hint_${E(o.spk)}">Catatan ini akan tampil sebagai report resmi kepada Admin.</p>
+            <div class="row" style="margin-top:12px">
+              <button class="b g" onclick="backToDrvUpload('${E(o.spk)}')">← Kembali ke Upload Foto POD</button>
+              <button class="b" onclick="submitDriverNoteStep('${E(o.spk)}')">✅ Selesaikan & Kirim ke Admin</button>
+            </div>
+          `}
+        </div>`;
+      };
+
+      const card = (o, idx) => {
+        if (o.drvStep === 'upload' || o.drvStep === 'note') return renderWizard(o);
+        const j = o.jenis || 'Import', isFirst = idx === 0, acc = o.accepted !== false;
+        if (!isFirst) {
+          return `<div class="dc locked">
+            <div class="row"><b>${E(o.spk)}</b> <span class="tag ${jClass(j)}">${E(jLabel(j))}</span> <span class="tag">🔒 Antrean Order #${idx + 1}</span><span style="margin-left:auto">Muat ${E(o.tgl)}</span></div>
+            <p class="hint" style="margin:8px 0 0"><b>${E(o.cust)}</b> · Alur: ${E(fmtRute(o))}<br><i>Order ini otomatis terbuka setelah order aktif di atas (<b>${E(run[0].spk)}</b>) selesai.</i></p>
+          </div>`;
+        }
+        return `<div class="dc ${!o.seen || !acc ? 'new' : ''}">
+          <div class="row">
+            <b>${E(o.spk)}</b>
+            <span class="tag ${jClass(j)}">${E(jLabel(j))}</span>
+            <span class="tag st-Dispatch">${acc ? 'Sedang Berjalan' : 'Order Baru Masuk'}</span>
+            ${!o.seen ? '<span class="bell">BARU</span>' : ''}
+            <span style="margin-left:auto">Muat ${E(o.tgl)}</span>
+          </div>
+          <div class="hint" style="margin-top:4px">Dispatch: ${E(o.dispatchedAt || o.tgl)}${o.acceptedAt ? ` · Diterima: ${E(o.acceptedAt)}` : ''}</div>
+          <p><b>${E(o.cust)}</b><br><b>Alur Rute:</b> ${E(fmtRute(o))}<br>${E(o.tipe)} · Unit ${E(o.trk)} · Container ${E(o.cont || '-')}${o.cat ? '<br>Catatan Admin: ' + E(o.cat) : ''}</p>
+          <p>Uang jalan: <b>${R(o.uj)}</b></p>
+          ${renderDocAttachmentBlock(o, true)}
+          <div class="row" style="margin-top:8px">${j == 'Import' ? T(o, 'term', '1. Terminal (Muat)', '') + T(o, 'depo', '3. Depo Empty (Kembali)', 't2') : j == 'Export' ? T(o, 'depo', '1. Depo Empty (Ambil)', 't2') + T(o, 'term', '3. Terminal (Bongkar)', '') : T(o, 'term', 'Terminal', '') + T(o, 'depo', 'Depo Empty', 't2')}</div>
+          <div class="row" style="margin-top:12px">
+            ${!acc ? `<button class="b" onclick="acceptO('${E(o.spk)}')">✅ Terima Order Ini</button>` : `<button class="b o" onclick="startFinishOrder('${E(o.spk)}')">✅ Selesaikan Order</button>`}
+            ${!o.seen && acc ? `<button class="b g" onclick="seen('${E(o.spk)}')">Tandai dibaca</button>` : ''}
+          </div>
+        </div>`;
+      };
+
+      return `<h2>Halo, ${E(me.n)}</h2>
+      ${run.length ? run.map((o, i) => card(o, i)).join('') : '<div class="card"><p>Belum ada order aktif untuk Anda.</p></div>'}
+      ${dn.length ? `<div class="card"><h3>Riwayat Selesai & Report Lapangan</h3>${dn.map(o => `<div style="padding:8px 0;border-bottom:1px solid var(--ln)">
+        <div><b>${E(o.spk)}</b> <span class="tag ${jClass(o.jenis)}">${E(jLabel(o.jenis))}</span> · Selesai: ${E(o.finishedAt || o.completedAt || o.tiba)} · ${E(fmtRute(o))} · <b>${R(o.uj)}</b></div>
+        <div class="hint" style="margin-top:3px">Situasi: <b class="${hasIssue(o) ? 'bad' : 'ok'}">${E(o.drvCond || 'Lancar')}</b>${o.drvReport ? ` — "${E(o.drvReport)}"` : ''} ${(o.photos && o.photos.pod) ? '📷 POD' : ''}</div>
+      </div>`).join('')}</div>` : ''}`;
+    }
+
+    function acceptO(n) {
+      const o = gO(n);
+      o.accepted = true; o.seen = true; o.acceptedAt = nowWib();
+      po(o); rr();
+      showToast(`Order ${n} diterima! Silakan cek file & rute.`);
+    }
+
+    function seen(n) { const o = gO(n); o.seen = true; po(o); }
+
+    function startFinishOrder(n) {
+      const o = gO(n);
+      if (me.role == 'driver' && o.drv != me.id) return showToast('Bukan order Anda.');
+      const wib = getWibParts();
+      o.completedAt = wib.full;
+      o.tiba = o.tiba || wib.iso;
+      o.drvStep = 'upload';
+      po(o); rr();
+      showToast(`Waktu selesai terekam (${wib.full}). Silakan upload foto Surat Jalan / POD.`);
+    }
+
+    function cancelFinishWizard(n) { const o = gO(n); o.drvStep = ''; po(o); rr(); }
+
+    async function handleDrvStepPhoto(el, n) {
+      const file = el.files && el.files[0];
+      if (!file) return;
+      const o = gO(n);
+      if ($('drv_st_pod')) $('drv_st_pod').textContent = 'Mengompres foto POD...';
+      try {
+        const dataUrl = await compressImg(file, 800, 0.7);
+        o.photos = o.photos || {};
+        o.photos.pod = dataUrl;
+        po(o);
+        if ($('drv_pv_pod')) { $('drv_pv_pod').src = dataUrl; $('drv_pv_pod').style.display = 'block'; }
+        if ($('drv_st_pod')) $('drv_st_pod').innerHTML = '<span class="ok">✓ Foto Surat Jalan / POD siap</span>';
+      } catch (e) {
+        if ($('drv_st_pod')) $('drv_st_pod').innerHTML = '<span class="bad">Gagal memproses foto</span>';
+      }
+    }
+
+    function saveDriverUploadStep(n) {
+      const o = gO(n);
+      const pod = (o.photos && o.photos.pod) || '';
+      if (!pod) return showToast('Silakan ambil atau unggah foto Surat Jalan / POD terlebih dahulu.');
+      o.drvStep = 'note';
+      po(o); rr();
+      showToast('Foto POD tersimpan. Silakan isi catatan situasi bongkar/muat untuk Admin.');
+    }
+
+    function backToDrvUpload(n) { const o = gO(n); o.drvStep = 'upload'; po(o); rr(); }
+
+    function onDrvCondChange(n) {
+      const c = $('drv_cond_' + n).value;
+      const h = $('drv_rep_hint_' + n);
+      if (h) h.innerHTML = c === 'Lancar' ? 'Catatan situasi bongkar/muat opsional jika berjalan lancar.' : '<b class="bad">Wajib diisi:</b> Jelaskan detail kendala di atas agar admin dapat menindaklanjutinya.';
+    }
+
+    function submitDriverNoteStep(n) {
+      const o = gO(n);
+      const cond = $('drv_cond_' + n).value;
+      const rep = $('drv_rep_' + n).value.trim();
+      if (cond !== 'Lancar' && !rep) return showToast('Tuliskan rincian kendala / situasi bongkar muat pada catatan.');
+      o.drvCond = cond;
+      o.drvReport = rep;
+      o.finishedAt = nowWib();
+      o.completedAt = o.completedAt || o.finishedAt;
+      o.tiba = o.tiba || getWibParts().iso;
+      o.drvStep = '';
+      o.st = 'Selesai';
+      po(o); rr();
+      showToast(`Order ${n} selesai & report terkirim ke Admin.`);
+    }
+
+    /* =========================================================================
+       REKON TOKEN OPS (HARIAN, MINGGUAN, BULANAN)
+       ========================================================================= */
+    function renderRekonView() {
+      const mode = window.rekMode || 'bulanan';
+      const refDate = window.rekDate || today();
+      const refMonth = window.rekMonth || today().slice(0, 7);
+
+      const inRange = dStr => {
+        if (!dStr) return false;
+        if (mode === 'harian') return dStr === refDate;
+        if (mode === 'mingguan') return dStr >= addDays(refDate, -6) && dStr <= refDate;
+        return dStr.startsWith(refMonth);
+      };
+
+      const labelPeriode = mode === 'harian' ? `Harian (${refDate})` : mode === 'mingguan' ? `Mingguan (${addDays(refDate, -6)} s/d ${refDate})` : `Bulanan (${refMonth})`;
+      const topList = (M.topups || []).filter(x => inRange(x.tgl)).sort((a, b) => (b.waktu || b.tgl).localeCompare(a.waktu || a.tgl));
+      const ordList = ALL().filter(o => o.st !== 'Batal' && inRange(o.tgl) && o.uj > 0);
+      const expList = (M.expenses || []).filter(e => inRange(e.tgl));
+
+      const totTop = topList.reduce((s, x) => s + x.nom, 0);
+      const totUj = ordList.reduce((s, o) => s + o.uj, 0);
+      const totExp = expList.reduce((s, e) => s + e.nom, 0);
+      const totOut = totUj + totExp;
+      const selisih = totTop - totOut;
+      const noteKey = mode === 'bulanan' ? refMonth : `${mode}_${refDate}`;
+      const noteObj = (M.rekonNotes || {})[noteKey] || { cat: '', by: '', at: '' };
+
+      return `<div class="card">
+        <div class="row">
+          <div>
+            <h2 style="margin:0">Rekonsiliasi Dana Operasional (Top-Up Kasir vs Token Admin)</h2>
+            <div class="hint">Review mutasi top-up kasir dan pengeluaran operasional admin secara harian, mingguan, maupun bulanan.</div>
+          </div>
+          <div style="margin-left:auto">${exportBtnsHtml(me.role === 'kasir' ? 'kas' : 'rek')}</div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <label style="max-width:190px">Metode Review<select onchange="rekMode=this.value;rr()">
+            <option value="harian" ${mode == 'harian' ? 'selected' : ''}>Harian</option>
+            <option value="mingguan" ${mode == 'mingguan' ? 'selected' : ''}>Mingguan (7 Hari)</option>
+            <option value="bulanan" ${mode == 'bulanan' ? 'selected' : ''}>Periode Bulanan</option>
+          </select></label>
+          ${mode === 'bulanan'
+            ? `<label style="max-width:180px">Periode Bulan<input type="month" value="${refMonth}" onchange="rekMonth=this.value;rr()"></label>`
+            : `<label style="max-width:180px">Tanggal Acuan<input type="date" value="${refDate}" onchange="rekDate=this.value;rr()"></label>`}
+        </div>
+
+        <div class="row" style="margin:14px 0">
+          <div class="stat ok"><b>${R(totTop)}</b><span>Total Top-Up Kasir (${E(labelPeriode)})</span></div>
+          <div class="stat"><b>${R(totUj)}</b><span>Keluar: Uang Jalan (${ordList.length} SPK)</span></div>
+          <div class="stat"><b>${R(totExp)}</b><span>Keluar: Perbaikan & Biaya</span></div>
+          <div class="stat ${selisih === 0 ? 'ok' : selisih > 0 ? 'warn' : 'bad'}"><b>${R(selisih)}</b><span>Selisih (${selisih > 0 ? 'Sisa Saldo Token' : selisih < 0 ? 'Kurang / Talangan Admin' : 'Klop / Balance'})</span></div>
+        </div>
+
+        <div class="route-box">
+          <b>Catatan Selisih & Berita Acara Rekonsiliasi (${E(labelPeriode)})</b>
+          <div class="row" style="margin-top:6px">
+            <label style="flex:3"><textarea id="rek_cat" rows="2" placeholder="Jelaskan penyebab selisih (misal: sisa saldo mengendap di token admin, bukti nota susulan)...">${E(noteObj.cat || '')}</textarea></label>
+            <button class="b o" onclick="saveRekonNote('${E(noteKey)}')">Simpan Catatan Selisih</button>
+          </div>
+          ${noteObj.at ? `<div class="hint" style="margin-top:4px">Terakhir diperbarui oleh <b>${E(noteObj.by)}</b> pada <b>${E(noteObj.at)}</b></div>` : ''}
+        </div>
+      </div>
+
+      ${['kasir', 'superadmin'].includes(me.role) ? `<div class="card">
+        <h3>Input Top-Up Dana Operasional ke Token Admin (Kasir)</h3>
+        <div class="row" style="margin-bottom:12px">
+          <label style="max-width:150px">Tanggal<input type="date" id="tp_tgl" value="${today()}"></label>
+          <label style="max-width:180px">Nominal Top-Up (Rp)<input type="number" min="0" id="tp_nom" placeholder="5000000"></label>
+          <label style="flex:2">Keterangan / Sumber Transfer<input id="tp_ket" placeholder="Contoh: Top-up token BCA Ops"></label>
+          <button class="b" onclick="addTopup()">+ Kirim Top-Up</button>
+        </div>
+      </div>` : ''}
+
+      <div class="card">
+        <h3>Riwayat Top-Up dari Kasir (${E(labelPeriode)})</h3>
+        <div class="tw"><table>
+          <tr><th>Waktu (WIB)</th><th>Keterangan</th><th>Diinput Oleh</th><th class="n">Nominal Top-Up</th><th></th></tr>
+          ${topList.map(t => `<tr><td>${E(t.waktu || t.tgl)}</td><td>${E(t.ket)}</td><td>${E(t.oleh)}</td><td class="n"><b>${R(t.nom)}</b></td><td>${isSA() ? `<button class="b s r" onclick="delTopup('${E(t.id)}')">Hapus</button>` : ''}</td></tr>`).join('') || '<tr><td colspan="5" class="hint">Belum ada top-up pada periode ini.</td></tr>'}
+        </table></div>
+      </div>`;
+    }
+
+    function addTopup() {
+      const tgl = $('tp_tgl').value, nom = Math.max(0, +$('tp_nom').value || 0), ket = $('tp_ket').value.trim();
+      if (!nom || !ket) return showToast('Isi nominal dan keterangan top-up.');
+      M.topups = M.topups || [];
+      M.topups.push({ id: 'TOP-' + Date.now(), tgl, waktu: nowWib(), nom, ket, oleh: me.n });
+      pm(); rr();
+      showToast('Top-up dana operasional dicatat.');
+    }
+
+    function delTopup(id) {
+      if (!isSA()) return;
+      M.topups = M.topups.filter(x => x.id != id);
+      pm(); rr();
+      showToast('Data top-up dihapus.');
+    }
+
+    function saveRekonNote(key) {
+      M.rekonNotes = M.rekonNotes || {};
+      M.rekonNotes[key] = { cat: $('rek_cat').value.trim(), by: me.n, at: nowWib() };
+      pm(); rr();
+      showToast('Catatan selisih rekonsiliasi tersimpan.');
+    }
+
+    function rek() { return renderRekonView(); }
+    function kas() { return renderRekonView(); }
+
+    /* =========================================================================
+       LAPORAN TRUCKING (HARIAN, BULANAN, PERIODE TANGGAL)
+       ========================================================================= */
+    function rpt() {
+      const mode = window.rptMode || 'harian';
+      const d = window.rd || today();
+      const ym = window.rymRpt || today().slice(0, 7);
+      const f = window.rf || today().slice(0, 8) + '01';
+      const t = window.rt2 || today();
+
+      const matchOrder = o => {
+        if (!['Selesai', 'Ditagih'].includes(o.st)) return false;
+        const tglRef = o.tiba || o.tgl || '';
+        if (mode === 'harian') return tglRef === d;
+        if (mode === 'bulanan') return tglRef.startsWith(ym);
+        return tglRef >= f && tglRef <= t;
+      };
+
+      const L = ALL().filter(matchOrder).sort((a, b) => (a.tiba || a.tgl).localeCompare(b.tiba || b.tgl));
+      const totPend = L.reduce((s, o) => s + sub(o), 0);
+      const totUj = L.reduce((s, o) => s + (+o.uj || 0), 0);
+      const totKom = L.reduce((s, o) => s + (+o.komisi || 0), 0);
+      const totMargin = totPend - totUj - totKom;
+
+      const labelPeriode = mode === 'harian' ? `Harian (${d})` : mode === 'bulanan' ? `Bulanan (${ym})` : `Periode (${f} s/d ${t})`;
+
+      let html = `<div class="card">
+        <div class="row" style="margin-bottom:8px">
+          <div>
+            <h2 style="margin:0">Laporan Trucking Operasional</h2>
+            <div class="hint">Tarik data operasional trucking berdasarkan metode Harian, Bulanan, atau Periode Tanggal.</div>
+          </div>
+          <div style="margin-left:auto">${exportBtnsHtml('rpt')}</div>
+        </div>
+        <div class="row" style="margin-bottom:12px">
+          <label style="max-width:210px">Metode Laporan<select onchange="rptMode=this.value;rr()">
+            <option value="harian" ${mode == 'harian' ? 'selected' : ''}>1. Laporan Harian</option>
+            <option value="bulanan" ${mode == 'bulanan' ? 'selected' : ''}>2. Laporan Bulanan</option>
+            <option value="periode" ${mode == 'periode' ? 'selected' : ''}>3. Metode Periode Tanggal</option>
+          </select></label>
+          ${mode === 'harian' ? `<label style="max-width:180px">Tanggal Selesai<input type="date" value="${d}" onchange="rd=this.value;rr()"></label>` : ''}
+          ${mode === 'bulanan' ? `<label style="max-width:180px">Bulan Laporan<input type="month" value="${ym}" onchange="rymRpt=this.value;rr()"></label>` : ''}
+          ${mode === 'periode' ? `<label style="max-width:170px">Dari Tanggal<input type="date" value="${f}" onchange="rf=this.value;rr()"></label><label style="max-width:170px">Sampai Tanggal<input type="date" value="${t}" onchange="rt2=this.value;rr()"></label>` : ''}
+        </div>
+        <div class="row" style="margin-bottom:12px">
+          <div class="stat"><b>${L.length} Trip</b><span>Ritase (${E(labelPeriode)})</span></div>
+          <div class="stat"><b>${R(totPend)}</b><span>Pendapatan Netto</span></div>
+          <div class="stat warn"><b>${R(totUj)}</b><span>Total Uang Jalan</span></div>
+          <div class="stat ok"><b>${R(totMargin)}</b><span>Margin Trip (Sebelum Overhead)</span></div>
+        </div>
+        <div class="tw"><table>
+          <tr><th>SPK</th><th>Jenis</th><th>Tgl Selesai & WIB</th><th>Customer / Sumber</th><th>Alur Rute</th><th>Driver / Unit</th><th>Situasi & Kendala</th><th class="n">Pendapatan</th><th class="n">Uang Jalan</th></tr>
+          ${L.map(o => `<tr>
+            <td><b>${E(o.spk)}</b></td>
+            <td><span class="tag ${jClass(o.jenis)}">${E(jLabel(o.jenis))}</span></td>
+            <td>${E(o.tiba || o.tgl)}<div class="hint">${E(o.finishedAt || o.completedAt || '-')}</div></td>
+            <td><b>${E(o.cust)}</b><div class="hint">${E(fmtSrcOrder(o))}</div></td>
+            <td>${E(fmtRute(o))}<div class="hint">${E(o.tipe)}</div></td>
+            <td>${E(drvN(o.drv))}<div class="hint">${E(o.trk || '-')}</div></td>
+            <td><b class="${hasIssue(o) ? 'bad' : 'ok'}">${E(o.drvCond || 'Lancar')}</b>${o.drvReport ? `<div class="hint">${E(o.drvReport)}</div>` : ''}</td>
+            <td class="n">${R(sub(o))}</td>
+            <td class="n">${R(o.uj)}</td>
+          </tr>`).join('') || '<tr><td colspan="9" class="hint">Tidak ada data retase pada periode yang dipilih.</td></tr>'}
+        </table></div>
+      </div>`;
+
+      if (!isSA()) return html;
+
+      const byJenis = { Import: { n: 0, r: 0, u: 0, k: 0 }, Export: { n: 0, r: 0, u: 0, k: 0 }, Repo: { n: 0, r: 0, u: 0, k: 0 } };
+      L.forEach(o => {
+        const j = o.jenis || 'Import';
+        byJenis[j].n++; byJenis[j].r += sub(o); byJenis[j].u += o.uj; byJenis[j].k += (+o.komisi || 0);
+      });
+
+      return html + `<div class="card">
+        <h2 style="margin:0 0 8px">Rekap per Jenis Order (${E(labelPeriode)})</h2>
+        <div class="tw"><table>
+          <tr><th>Jenis Order</th><th class="n">Trip</th><th class="n">Pendapatan</th><th class="n">Uang Jalan</th><th class="n">Komisi</th><th class="n">Margin</th></tr>
+          ${['Import', 'Export', 'Repo'].map(j => `<tr>
+            <td><span class="tag ${jClass(j)}">${jLabel(j)}</span></td>
+            <td class="n">${byJenis[j].n}</td>
+            <td class="n">${R(byJenis[j].r)}</td>
+            <td class="n">${R(byJenis[j].u)}</td>
+            <td class="n">${R(byJenis[j].k)}</td>
+            <td class="n"><b>${R(byJenis[j].r - byJenis[j].u - byJenis[j].k)}</b></td>
+          </tr>`).join('')}
+        </table></div>
+      </div>`;
+    }
+
+    /* =========================================================================
+       LAPORAN LABA RUGI OPERASIONAL (SUPERADMIN)
+       ========================================================================= */
+    function getPnlData(ym) {
+      const s = M.set || {};
+      const cicilan = +s.cicilanTruk || 0;
+      const jmlSupir = s.jmlSupir !== undefined ? +s.jmlSupir : 6;
+      const gajiSupirSatuan = s.gajiSupirSatuan !== undefined ? +s.gajiSupirSatuan : 1000000;
+      const totGajiSupir = jmlSupir * gajiSupirSatuan;
+      const gajiMontir = s.gajiMontir !== undefined ? +s.gajiMontir : 6000000;
+
+      const doneOrders = ALL().filter(o => ['Selesai', 'Ditagih'].includes(o.st) && (o.tiba || o.tgl).startsWith(ym));
+      const expList = (M.expenses || []).filter(e => (e.tgl || '').startsWith(ym));
+
+      const revNetto = doneOrders.reduce((sum, o) => sum + sub(o), 0);
+      const totUj = doneOrders.reduce((sum, o) => sum + (+o.uj || 0), 0);
+      const totKomisi = doneOrders.reduce((sum, o) => sum + (+o.komisi || 0), 0);
+      const totMaint = expList.reduce((sum, e) => sum + (+e.nom || 0), 0);
+
+      const directCost = totUj + totKomisi + totMaint;
+      const grossProfit = revNetto - directCost;
+      const fixedCost = cicilan + totGajiSupir + gajiMontir;
+      const netProfit = grossProfit - fixedCost;
+
+      return { ym, doneOrders, expList, revNetto, totUj, totKomisi, totMaint, directCost, grossProfit, cicilan, jmlSupir, gajiSupirSatuan, totGajiSupir, gajiMontir, fixedCost, netProfit };
+    }
+
+    function pnl() {
+      if (!isSA()) return '<div class="card"><p class="bad">Akses khusus Superadmin.</p></div>';
+      const ym = window.pnlMonth || today().slice(0, 7);
+      const d = getPnlData(ym);
+      return `<div class="card">
+        <div class="row">
+          <div>
+            <h2 style="margin:0">Laporan Laba Rugi Operasional Trucking</h2>
+            <div class="hint">Perhitungan pendapatan retase dikurangi biaya operasional langsung, cicilan armada, gaji 6 supir, dan beban montir.</div>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">${exportBtnsHtml('pnl')}</div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <label style="max-width:190px">Periode Bulan Laporan<input type="month" value="${ym}" onchange="pnlMonth=this.value;rr()"></label>
+        </div>
+        <div class="row" style="margin:14px 0">
+          <div class="stat"><b>${R(d.revNetto)}</b><span>Pendapatan Trucking (${d.doneOrders.length} Trip)</span></div>
+          <div class="stat warn"><b>${R(d.directCost)}</b><span>Beban Langsung (Uang Jalan + Servis)</span></div>
+          <div class="stat warn"><b>${R(d.fixedCost)}</b><span>Beban Tetap (Cicilan + Supir + Montir)</span></div>
+          <div class="stat ${d.netProfit >= 0 ? 'ok' : 'bad'}"><b>${R(d.netProfit)}</b><span>${d.netProfit >= 0 ? 'LABA BERSIH OPERASIONAL' : 'RUGI BERSIH OPERASIONAL'}</span></div>
+        </div>
+
+        <div class="route-box" style="margin-bottom:14px">
+          <div class="route-flow" style="margin-bottom:6px">Parameter Beban Biaya Tetap Bulanan (Dapat Disesuaikan Superadmin)</div>
+          <div class="row">
+            <label>Beban Cicilan Trucking / Bulan (Rp)<input type="number" min="0" id="pnl_cicilan" value="${d.cicilan}"></label>
+            <label style="max-width:130px">Jumlah Supir<input type="number" min="0" id="pnl_jsupir" value="${d.jmlSupir}"></label>
+            <label>Gaji Pokok / Supir (Rp)<input type="number" min="0" id="pnl_gsupir" value="${d.gajiSupirSatuan}"></label>
+            <label>Beban Biaya Montir / Bulan (Rp)<input type="number" min="0" id="pnl_gmontir" value="${d.gajiMontir}"></label>
+            <button class="b o" onclick="savePnlParams()">Simpan Parameter Beban</button>
+          </div>
+        </div>
+
+        <div class="tw"><table>
+          <tr><th>Uraian Akun Laba Rugi (${ym})</th><th>Keterangan</th><th class="n">Nominal (Rp)</th></tr>
+          <tr style="background:var(--bg)"><td colspan="3"><b>A. PENDAPATAN USAHA</b></td></tr>
+          <tr><td>Pendapatan Jasa Trucking (Netto DPP)</td><td>${d.doneOrders.length} order selesai / ditagih</td><td class="n"><b>${R(d.revNetto)}</b></td></tr>
+          <tr style="background:var(--bg)"><td colspan="3"><b>B. BEBAN OPERASIONAL LANGSUNG (VARIABEL)</b></td></tr>
+          <tr><td>Beban Uang Jalan Driver</td><td>Akumulasi uang jalan ${d.doneOrders.length} trip</td><td class="n bad">− ${R(d.totUj)}</td></tr>
+          <tr><td>Beban Komisi Order (SPK)</td><td>Komisi per SPK</td><td class="n bad">− ${R(d.totKomisi)}</td></tr>
+          <tr><td>Beban Perbaikan, Maintenance & Sparepart</td><td>${d.expList.length} transaksi bengkel / operasional</td><td class="n bad">− ${R(d.totMaint)}</td></tr>
+          <tr style="border-top:2px solid var(--ln)"><td colspan="2"><b>LABA KOTOR OPERASIONAL (A − B)</b></td><td class="n"><b>${R(d.grossProfit)}</b></td></tr>
+          <tr style="background:var(--bg)"><td colspan="3"><b>C. BEBAN BIAYA TETAP BULANAN (OVERHEAD ARMADA)</b></td></tr>
+          <tr><td>Beban Biaya Cicilan Trucking</td><td>Angsuran unit armada bulan ${ym}</td><td class="n bad">− ${R(d.cicilan)}</td></tr>
+          <tr><td>Beban Gaji Supir (${d.jmlSupir} Orang × ${R(d.gajiSupirSatuan)})</td><td>Gaji bulanan ${d.jmlSupir} supir</td><td class="n bad">− ${R(d.totGajiSupir)}</td></tr>
+          <tr><td>Beban Biaya Montir / Mekanik</td><td>Biaya montir bulanan</td><td class="n bad">− ${R(d.gajiMontir)}</td></tr>
+          <tr style="border-top:2px solid var(--tx);font-size:16px">
+            <td colspan="2"><b>${d.netProfit >= 0 ? 'LABA BERSIH OPERASIONAL (A − B − C)' : 'RUGI BERSIH OPERASIONAL (A − B − C)'}</b></td>
+            <td class="n ${d.netProfit >= 0 ? 'ok' : 'bad'}"><b>${R(d.netProfit)}</b></td>
+          </tr>
+        </table></div>
+      </div>`;
+    }
+
+    function savePnlParams() {
+      if (!isSA()) return;
+      M.set = M.set || {};
+      M.set.cicilanTruk = Math.max(0, +$('pnl_cicilan').value || 0);
+      M.set.jmlSupir = Math.max(0, +$('pnl_jsupir').value || 0);
+      M.set.gajiSupirSatuan = Math.max(0, +$('pnl_gsupir').value || 0);
+      M.set.gajiMontir = Math.max(0, +$('pnl_gmontir').value || 0);
+      pm(); rr();
+      showToast('Parameter beban cicilan, gaji supir & montir tersimpan.');
+    }
+
+    /* =========================================================================
+       INVOICE A4 & DATA CUSTOMER (KASIR)
+       ========================================================================= */
+    function fmtInvRp(n) { return Rplain(n); }
+
+    function terbilangId(num) {
+      num = Math.floor(Math.abs(+num || 0));
+      if (num === 0) return 'Nol Rupiah';
+      const satuan = ['', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan', 'Sepuluh', 'Sebelas'];
+      const spell = x => {
+        if (x < 12) return satuan[x];
+        if (x < 20) return satuan[x - 10] + ' Belas';
+        if (x < 100) return satuan[Math.floor(x / 10)] + ' Puluh' + (x % 10 ? ' ' + spell(x % 10) : '');
+        if (x < 200) return 'Seratus' + (x % 100 ? ' ' + spell(x % 100) : '');
+        if (x < 1000) return satuan[Math.floor(x / 100)] + ' Ratus' + (x % 100 ? ' ' + spell(x % 100) : '');
+        if (x < 2000) return 'Seribu' + (x % 1000 ? ' ' + spell(x % 1000) : '');
+        if (x < 1000000) return spell(Math.floor(x / 1000)) + ' Ribu' + (x % 1000 ? ' ' + spell(x % 1000) : '');
+        if (x < 1000000000) return spell(Math.floor(x / 1000000)) + ' Juta' + (x % 1000000 ? ' ' + spell(x % 1000000) : '');
+        return spell(Math.floor(x / 1000000000)) + ' Miliar' + (x % 1000000000 ? ' ' + spell(x % 1000000000) : '');
+      };
+      return spell(num) + ' Rupiah';
+    }
+
+    function inv() {
+      const rd = ALL().filter(o => o.st == 'Selesai'), ov = overdueInvs();
+      return `${ov.length ? `<div class="card" style="border-left:5px solid var(--bad)"><b class="bad">⚠️ Perhatian: Terdapat ${ov.length} Invoice Jatuh Tempo!</b></div>` : ''}
+      <div class="card">
+        <div class="row" style="margin-bottom:8px">
+          <h2 style="margin:0">Siap ditagih (Kasir)</h2>
+          <div style="margin-left:auto">${exportBtnsHtml('inv')}</div>
+        </div>
+        <div class="tw"><table>
+          <tr><th></th><th>SPK</th><th>Jenis</th><th>Customer</th><th>Alur Rute</th><th>Container</th><th class="n">Total</th></tr>
+          ${rd.map(o => `<tr>
+            <td><input type="checkbox" class="ck" data-c="${E(o.cust)}" value="${E(o.spk)}" onchange="ckc(this)"></td>
+            <td><b>${E(o.spk)}</b></td>
+            <td><span class="tag ${jClass(o.jenis)}">${E(jLabel(o.jenis))}</span></td>
+            <td>${E(o.cust)}</td>
+            <td>${E(fmtRute(o))}</td>
+            <td>${E(o.cont || '-')}</td>
+            <td class="n">${R(tot(o))}</td>
+          </tr>`).join('') || '<tr><td colspan="7" class="hint">Belum ada order selesai.</td></tr>'}
+        </table></div>
+        <div class="row" style="margin-top:10px">
+          <label style="max-width:160px">Termin (hari)<input type="number" min="0" id="trm" value="${M.set.term}"></label>
+          <button class="b o" onclick="mkInv()">Terbitkan invoice A4</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Daftar invoice</h2>
+        <div class="tw"><table>
+          <tr><th>No. Invoice</th><th>Tanggal</th><th>Jatuh tempo</th><th>Customer</th><th class="n">Total</th><th></th></tr>
+          ${Object.values(V).sort((a, b) => a.no < b.no ? 1 : -1).map(i => `<tr>
+            <td><b>${E(i.no)}</b></td>
+            <td>${E(i.tgl)}</td>
+            <td>${E(i.due)}</td>
+            <td>${E(i.cust)}</td>
+            <td class="n">${R(i.total)}</td>
+            <td><button class="b s g" onclick="openI('${E(i.id)}')">Lihat / Cetak A4</button></td>
+          </tr>`).join('') || '<tr><td colspan="6" class="hint">Belum ada invoice.</td></tr>'}
+        </table></div>
+      </div>`;
+    }
+
+    function ckc(el) {
+      document.querySelectorAll('.ck:checked').forEach(x => { if (x.dataset.c != el.dataset.c) x.checked = false; });
+    }
+
+    function mkInv() {
+      const ns = [...document.querySelectorAll('.ck:checked')].map(x => x.value);
+      if (!ns.length) return showToast('Centang minimal satu order.');
+      const os = ns.map(gO), term = Math.max(0, +$('trm').value || 0), d = today();
+      const p = 'INV/' + d.slice(0, 4) + '/' + d.slice(5, 7) + '/';
+      const k = Math.max(0, ...Object.values(V).filter(v => v.no.startsWith(p)).map(v => +v.no.slice(p.length) || 0));
+      const no = p + String(k + 1).padStart(3, '0');
+      const id = no.replace(/\//g, '-');
+      const orderNo = '0' + String(k + 1).padStart(3, '0') + '/GTR-TRK/' + d.slice(5, 7) + '/' + d.slice(0, 4);
+      pv({ id, no, orderNo, tgl: d, createdAt: nowWib(), due: addDays(d, term), term, cust: os[0].cust, orders: ns, total: os.reduce((s, o) => s + tot(o), 0) });
+      os.forEach(o => { o.st = 'Ditagih'; po(o); });
+      M.set.term = term; pm();
+      openI(id);
+      showToast(`Invoice ${no} diterbitkan.`);
+    }
+
+    function openI(id) {
+      const i = V[id];
+      if (!i) return;
+      const os = i.orders.map(gO).filter(Boolean);
+      const S0 = os.reduce((s, o) => s + sub(o), 0);
+      const P = os.reduce((s, o) => s + ppn(o), 0);
+      const Hh = os.reduce((s, o) => s + pph(o), 0);
+      const cInfo = (M.custList || []).find(x => x.n == i.cust) || {};
+      const ordNo = i.orderNo || i.no;
+
+      const rowHtml = os.map((o, idx) => {
+        const sizeMatch = (o.tipe || '').match(/20|40/);
+        const sz = sizeMatch ? sizeMatch[0] : (o.tipe || '-');
+        const dari = (o.jenis === 'Export' || (o.jenis === 'Repo' && o.repoDir === 'D2T')) ? (o.depo || '-') : (o.term || o.a || '-');
+        const tujuan = o.jenis === 'Repo' ? (o.repoDir === 'D2T' ? (o.term || '-') : (o.depo || '-')) : (o.t || '-');
+        const loloItem = (o.items || []).slice(1).reduce((s, it) => s + (+it.q || 0) * (+it.p || 0), 0);
+        const trkAmt = sub(o) - loloItem;
+        const lineTot = sub(o);
+        return `<tr>
+          <td class="c">${idx + 1}</td>
+          <td>${E(o.spk)}</td>
+          <td>${E(o.cont || '-')}</td>
+          <td class="c">${E(sz)}</td>
+          <td>${E(jLabel(o.jenis))}</td>
+          <td>${E(dari)}</td>
+          <td>${E(tujuan)}</td>
+          <td class="n">${fmtInvRp(trkAmt)}</td>
+          <td class="n">${fmtInvRp(loloItem)}</td>
+          <td class="n"><b>${fmtInvRp(lineTot)}</b></td>
+        </tr>`;
+      }).join('');
+
+      modal(`<div class="a4-inv">
+        ${KOP_HTML}
+        <div class="a4-top-meta">
+          <div>
+            <div class="a4-title">INVOICE</div>
+            <div class="a4-order-no">ORDER No.: ${E(ordNo)}</div>
+          </div>
+        </div>
+
+        <div class="a4-info-grid">
+          <div class="a4-box">
+            <div class="a4-box-title">Consignee / Bill To</div>
+            <table class="a4-kv">
+              <tr><td class="lbl">Name</td><td class="sep">:</td><td class="val">${E(i.cust)}</td></tr>
+              <tr><td class="lbl">Address</td><td class="sep">:</td><td class="val">${E(cInfo.al || '-')}</td></tr>
+            </table>
+          </div>
+          <div class="a4-box">
+            <div class="a4-box-title">Invoice Details</div>
+            <table class="a4-kv">
+              <tr><td class="lbl">No Invoice</td><td class="sep">:</td><td class="val">${E(i.no)}</td></tr>
+              <tr><td class="lbl">Tgl Invoice</td><td class="sep">:</td><td class="val">${E(i.tgl)}</td></tr>
+              <tr><td class="lbl">Jatuh Tempo</td><td class="sep">:</td><td class="val">${E(i.due)}</td></tr>
+              <tr><td class="lbl">TOP</td><td class="sep">:</td><td class="val">${E(i.term ?? M.set.term)} Hari</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <table class="a4-items">
+          <thead>
+            <tr>
+              <th class="c" style="width:28px">No.</th>
+              <th style="width:74px">Id booking</th>
+              <th style="width:78px">Container</th>
+              <th class="c" style="width:36px">Size</th>
+              <th style="width:52px">Status</th>
+              <th style="width:78px">Dari</th>
+              <th style="width:82px">Tujuan</th>
+              <th class="n" style="width:72px">TARIF TRUCKING</th>
+              <th class="n" style="width:62px">TARIF LOLO</th>
+              <th class="n" style="width:76px">TOTAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowHtml}
+            <tr>
+              <td colspan="7" class="n">Subtotal (DPP)</td>
+              <td colspan="3" class="n">${fmtInvRp(S0)}</td>
+            </tr>
+            <tr>
+              <td colspan="7" class="n">PPN ${M.set.ppn}%</td>
+              <td colspan="3" class="n">${fmtInvRp(P)}</td>
+            </tr>
+            ${Hh ? `<tr><td colspan="7" class="n">PPh 23 (${M.set.pph}%)</td><td colspan="3" class="n">− ${fmtInvRp(Hh)}</td></tr>` : ''}
+            <tr class="a4-grand-row">
+              <td colspan="7" class="n">Grand Total</td>
+              <td colspan="3" class="n">${fmtInvRp(i.total)}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="a4-terbilang">
+          <b>Terbilang:</b> <i>${E(terbilangId(i.total))}</i>
+        </div>
+
+        <div class="a4-bottom">
+          <div class="a4-pay">
+            <b class="hd-pay">PAYMENT INFORMATION:</b>
+            <div>Bank: <b>${E(CO.bank)}</b></div>
+            <div>No Rekening: <b>${E(CO.norek)}</b></div>
+            <div>Atas Nama: <b>${E(CO.an)}</b></div>
+          </div>
+          <div class="a4-sign">
+            <div>Petugas Finance</div>
+            <div class="a4-sign-space"></div>
+            <div class="a4-sign-line">( ${E(CO.finance)} )</div>
+          </div>
+        </div>
+
+        <div class="a4-foot">
+          <span>Page 1/1 · ${E(CO.n)}</span>
+          <span>Dicetak: ${nowWib()}</span>
+        </div>
+      </div>
+
+      <div class="row np" style="margin-top:12px">
+        <button class="b" onclick="window.print()">🖨️ Cetak / Simpan PDF (A4)</button>
+        <button class="b g" onclick="closeM()">Tutup</button>
+      </div>`);
+    }
+
+    function cst() {
+      M.custList = M.custList || [];
+      return `<div class="card">
+        <div class="row" style="margin-bottom:8px">
+          <h2 style="margin:0">Data Customer / Pemilik Order</h2>
+          <div style="margin-left:auto">${exportBtnsHtml('cst')}</div>
+        </div>
+        <div class="row" style="margin-bottom:12px">
+          <label>Nama Customer / Pemilik Order<input id="c_n" placeholder="PT. ..."></label>
+          <label style="flex:2">Alamat Penagihan<input id="c_al" placeholder="Alamat lengkap penagihan"></label>
+          <button class="b o" onclick="saveCst()">+ Simpan Customer</button>
+        </div>
+        <div class="tw"><table>
+          <tr><th>Nama Customer</th><th>Alamat Penagihan</th><th></th></tr>
+          ${M.custList.map((c, i) => `<tr>
+            <td><b>${E(c.n)}</b></td>
+            <td>${E(c.al || '-')}</td>
+            <td>${isSA() ? `<button class="b s r" onclick="M.custList.splice(${i},1);pm();rr()">Hapus</button>` : ''}</td>
+          </tr>`).join('') || '<tr><td colspan="3" class="hint">Belum ada data customer.</td></tr>'}
+        </table></div>
+      </div>`;
+    }
+
+    function saveCst() {
+      const n = $('c_n').value.trim(), al = $('c_al').value.trim();
+      if (!n) return showToast('Isi nama customer.');
+      M.custList = M.custList || [];
+      const ex = M.custList.find(x => x.n.toLowerCase() == n.toLowerCase());
+      if (ex) ex.al = al;
+      else M.custList.push({ n, al });
+      if (!M.custs.includes(n)) M.custs.push(n);
+      pm(); rr();
+      showToast('Data customer tersimpan.');
+    }
+
+    /* =========================================================================
+       MASTER DATA & PENGATURAN USER (SUPERADMIN)
+       ========================================================================= */
+    const SCH = {
+      drv: { t: 'driver', l: 'drivers', f: [['n', 'Nama driver'], ['hp', 'No. telepon'], ['plat', 'No. polisi'], ['us', 'Username'], ['pw', 'Password', 'p']] },
+      trk: { t: 'unit truk & STNK', l: 'trucks', f: [['plat', 'No. polisi'], ['jenis', 'Jenis unit'], ['stnk', 'No. STNK'], ['pajakDue', 'Tgl Pajak Tahunan (YYYY-MM-DD)'], ['stnkDue', 'Berlaku STNK 5-Th (YYYY-MM-DD)']] },
+      rt: { t: 'rute & tarif', l: 'routes', f: [['jenis', 'Jenis (Import/Export/Repo)'], ['term', 'Terminal'], ['t', 'Alamat Tujuan'], ['depo', 'Depo Empty'], ...TIPE.map((x, i) => ['c' + i, 'Ongkos ' + x, 'n']), ...TIPE.map((x, i) => ['u' + i, 'Uang jalan ' + x, 'n'])] }
+    };
+
+    function ed(k, i) {
+      const s = SCH[k], r = i < 0 ? { jenis: 'Import', pajakDue: today(), stnkDue: today() } : cl(M[s.l][i]);
+      if (k == 'rt') TIPE.forEach((_, j) => { r['c' + j] = (r.c || [])[j]; r['u' + j] = (r.u || [])[j]; });
+      modal(`<h2>${i < 0 ? 'Tambah' : 'Edit'} ${s.t}</h2>
+      <div class="row">${s.f.map(f => `<label>${f[1]}<input id="e_${f[0]}" type="${f[2] == 'n' ? 'number' : f[2] == 'p' ? 'password' : f[0].endsWith('Due') ? 'date' : 'text'}" value="${f[2] == 'p' ? '' : E(r[f[0]] ?? '')}" ${f[2] == 'p' ? `placeholder="${i < 0 ? 'wajib diisi' : 'kosongkan jika tidak diganti'}"` : ''}></label>`).join('')}</div>
+      <div class="row" style="margin-top:12px"><button class="b" onclick="sv('${k}',${i})">Simpan</button><button class="b g" onclick="closeM()">Batal</button></div>`);
+    }
+
+    async function sv(k, i) {
+      const s = SCH[k], o = i < 0 ? {} : cl(M[s.l][i]);
+      for (const f of s.f) {
+        const v = $('e_' + f[0]).value.trim();
+        if (f[2] == 'p') { if (v) o.pw = await H(v); }
+        else o[f[0]] = f[2] == 'n' ? +v || 0 : v;
+      }
+      const first = s.f[0][0];
+      if (!o[first] || (k == 'rt' && (!o.term || !o.depo))) return showToast('Lengkapi data wajib.');
+      if (k == 'drv') { if (!o.us || !o.plat) return showToast('Username dan no. polisi wajib diisi.'); if (i < 0 && !o.pw) return showToast('Password wajib diisi.'); if (i < 0) o.id = 'D' + Date.now(); }
+      if (k == 'rt') { o.jenis = ['Import', 'Export', 'Repo'].includes(o.jenis) ? o.jenis : 'Import'; if (o.jenis === 'Repo' && !o.t) o.t = 'Repo Container'; o.c = TIPE.map((_, j) => o['c' + j] || 0); o.u = TIPE.map((_, j) => o['u' + j] || 0); TIPE.forEach((_, j) => { delete o['c' + j]; delete o['u' + j]; }); }
+      if (i < 0) M[s.l].push(o);
+      else M[s.l][i] = o;
+      pm(); closeM();
+      showToast('Data master tersimpan.');
+    }
+
+    function rm(k, i) {
+      if (!isSA()) return;
+      M[SCH[k].l].splice(i, 1);
+      pm(); rr();
+      showToast('Data master dihapus.');
+    }
+
+    const eb = (k, i) => `<button class="b s g" onclick="ed('${k}',${i})">Edit</button>${isSA() ? ` <button class="b s r" onclick="rm('${k}',${i})">Hapus</button>` : ''}`;
+
+    function mst() {
+      return `<div class="card">
+        <div class="row" style="margin-bottom:8px">
+          <h2 style="margin:0">Unit Truk & Masa Berlaku STNK / Pajak</h2>
+          <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">
+            ${exportBtnsHtml('mst')}
+            <button class="b s o" onclick="ed('trk',-1)">+ Unit truk</button>
+          </div>
+        </div>
+        <div class="tw"><table>
+          <tr><th>No. Polisi</th><th>Jenis</th><th>No. STNK</th><th>Tgl Pajak Tahunan</th><th>Masa Berlaku STNK</th><th>Status</th><th></th></tr>
+          ${M.trucks.map((d, i) => {
+            const dp = diffDays(d.pajakDue), ds = diffDays(d.stnkDue);
+            let stTag = '<span class="tag" style="background:var(--ok);color:#fff">Aktif</span>';
+            if (dp < 0 || ds < 0) stTag = '<span class="tag" style="background:var(--bad);color:#fff">EXPIRED</span>';
+            else if (dp <= 30 || ds <= 30) stTag = `<span class="tag" style="background:var(--ac2);color:#1b1206">Jatuh Tempo (${Math.min(dp, ds)} hr)</span>`;
+            return `<tr><td><b>${E(d.plat)}</b></td><td>${E(d.jenis)}</td><td>${E(d.stnk || '-')}</td><td>${E(d.pajakDue || '-')}</td><td>${E(d.stnkDue || '-')}</td><td>${stTag}</td><td>${eb('trk', i)}</td></tr>`;
+          }).join('')}
+        </table></div>
+      </div>
+
+      <div class="card">
+        <div class="row"><h2 style="margin:0">Driver</h2><button class="b s o" style="margin-left:auto" onclick="ed('drv',-1)">+ Driver</button></div>
+        <div class="tw"><table>
+          <tr><th>Nama</th><th>No. telepon</th><th>No. polisi</th><th>Username</th><th></th></tr>
+          ${M.drivers.map((d, i) => `<tr><td>${E(d.n)}</td><td>${E(d.hp)}</td><td>${E(d.plat)}</td><td>${E(d.us)}</td><td>${eb('drv', i)}</td></tr>`).join('')}
+        </table></div>
+      </div>
+
+      <div class="card">
+        <div class="row"><h2 style="margin:0">Tarif Rute (Import, Export & Repo)</h2><button class="b s o" style="margin-left:auto" onclick="ed('rt',-1)">+ Rute</button></div>
+        <div class="tw"><table>
+          <tr><th>Jenis</th><th>Terminal</th><th>Alamat Tujuan</th><th>Depo Empty</th><th class="n">Ongkos 20ft</th><th class="n">Ongkos 40ft</th><th class="n">Uang jalan 20ft</th><th class="n">Uang jalan 40ft</th><th></th></tr>
+          ${M.routes.map((r, i) => {
+            const j = r.jenis || 'Import';
+            return `<tr><td><span class="tag ${jClass(j)}">${E(jLabel(j))}</span></td><td>${E(r.term || r.a)}</td><td>${E(r.t)}</td><td>${E(r.depo || '-')}</td><td class="n">${R(r.c[0])}</td><td class="n">${R(r.c[1])}</td><td class="n">${R(r.u[0])}</td><td class="n">${R(r.u[1])}</td><td>${eb('rt', i)}</td></tr>`;
+          }).join('')}
+        </table></div>
+      </div>`;
+    }
+
+    function cfg() {
+      if (!isSA()) return '<div class="card"><p class="bad">Menu Pengaturan hanya dapat diakses oleh Superadmin.</p></div>';
+      return `<div class="card">
+        <h2>Pengaturan Akun User & Hak Akses (Superadmin)</h2>
+        <p class="hint">Tambah, ubah password/role, atau hapus akun pengguna sistem (Superadmin, Admin Ops, Kasir). Akun Driver dikelola di menu Master.</p>
+        <div class="route-box" style="margin-bottom:14px">
+          <div class="route-flow" style="margin-bottom:6px">Tambah User Baru</div>
+          <div class="row">
+            <label>Nama Lengkap<input id="u_new_n" placeholder="Contoh: Budi Finance"></label>
+            <label>Username Login<input id="u_new_us" placeholder="Contoh: budi_ops"></label>
+            <label>Password<input type="password" id="u_new_pw" placeholder="Minimal 6 karakter"></label>
+            <label style="max-width:190px">Pilihan Role Akses<select id="u_new_role">
+              <option value="admin">Admin Ops (Operasional)</option>
+              <option value="kasir">Kasir (Invoice & Top-Up)</option>
+              <option value="superadmin">Superadmin (Akses Penuh)</option>
+            </select></label>
+            <button class="b o" onclick="addSystemUser()">+ Tambah User</button>
+          </div>
+        </div>
+        <div class="tw"><table>
+          <tr><th>Nama Lengkap</th><th>Username</th><th>Role Akses</th><th>Aksi</th></tr>
+          ${(M.users || []).map((u, idx) => `<tr>
+            <td><b>${E(u.n)}</b>${u.us === me.us ? ' <span class="tag st-Dispatch">Sedang Login</span>' : ''}</td>
+            <td><code>${E(u.us)}</code></td>
+            <td><span class="tag ${u.role === 'superadmin' ? 'jn-Repo' : u.role === 'kasir' ? 'jn-Export' : 'jn-Import'}">${E(u.role.toUpperCase())}</span></td>
+            <td>
+              <button class="b s g" onclick="openEditUser(${idx})">Edit / Reset Password</button>
+              ${u.us !== me.us ? `<button class="b s r" onclick="delSystemUser(${idx})">Hapus</button>` : '<span class="hint">Akun aktif</span>'}
+            </td>
+          </tr>`).join('')}
+        </table></div>
+      </div>`;
+    }
+
+    async function addSystemUser() {
+      if (!isSA()) return;
+      const n = $('u_new_n').value.trim();
+      const us = $('u_new_us').value.trim().toLowerCase();
+      const pwRaw = $('u_new_pw').value;
+      const role = $('u_new_role').value;
+      if (!n || !us || !pwRaw) return showToast('Lengkapi Nama, Username, dan Password.');
+      if (M.users.some(x => x.us.toLowerCase() === us) || M.drivers.some(x => x.us.toLowerCase() === us)) {
+        return showToast('Username sudah digunakan, pilih username lain.');
+      }
+      const pw = await H(pwRaw);
+      M.users.push({ us, pw, role, n });
+      pm(); rr();
+      showToast(`User ${n} (${role}) berhasil ditambahkan.`);
+    }
+
+    function openEditUser(idx) {
+      if (!isSA()) return;
+      const u = M.users[idx];
+      if (!u) return;
+      modal(`<h2>Edit Akun User · ${E(u.n)}</h2>
+      <div class="row">
+        <label>Nama Lengkap<input id="eu_n" value="${E(u.n)}"></label>
+        <label>Username<input id="eu_us" value="${E(u.us)}"></label>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <label>Role Akses<select id="eu_role">
+          <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin Ops</option>
+          <option value="kasir" ${u.role === 'kasir' ? 'selected' : ''}>Kasir</option>
+          <option value="superadmin" ${u.role === 'superadmin' ? 'selected' : ''}>Superadmin</option>
+        </select></label>
+        <label>Password Baru (Kosongkan jika tidak diubah)<input type="password" id="eu_pw" placeholder="Isi untuk ganti password"></label>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button class="b" onclick="saveEditUser(${idx})">Simpan Perubahan</button>
+        <button class="b g" onclick="closeM()">Batal</button>
+      </div>`);
+    }
+
+    async function saveEditUser(idx) {
+      if (!isSA()) return;
+      const u = M.users[idx];
+      const n = $('eu_n').value.trim();
+      const us = $('eu_us').value.trim().toLowerCase();
+      const role = $('eu_role').value;
+      const pwRaw = $('eu_pw').value;
+      if (!n || !us) return showToast('Nama dan username wajib diisi.');
+      if (M.users.some((x, i) => i !== idx && x.us.toLowerCase() === us)) return showToast('Username sudah dipakai akun lain.');
+      u.n = n; u.us = us; u.role = role;
+      if (pwRaw) u.pw = await H(pwRaw);
+      pm(); closeM();
+      showToast('Data user berhasil diperbarui.');
+    }
+
+    function delSystemUser(idx) {
+      if (!isSA()) return;
+      const u = M.users[idx];
+      if (!u || u.us === me.us) return showToast('Tidak dapat menghapus akun yang sedang digunakan.');
+      M.users.splice(idx, 1);
+      pm(); rr();
+      showToast(`User ${u.n} telah dihapus.`);
+    }
+
+    window.addEventListener('DOMContentLoaded', boot);
+  </script>
+</body>
+</html>
