@@ -389,6 +389,13 @@ if ($action === 'saveOrder') {
                     jsonOut(['ok' => false, 'error' => 'Jam selesai harus setelah jam mulai pada tanggal muat yang sama.'], 400);
                 }
 
+                $isLegacyScheduleRepair = is_array($current)
+                    && ($current['st'] ?? '') === 'Dispatch'
+                    && ($current['drv'] ?? '') === ($payload['drv'] ?? '')
+                    && ($current['trk'] ?? '') === ($payload['trk'] ?? '')
+                    && ($current['tgl'] ?? '') === ($payload['tgl'] ?? '')
+                    && (empty($current['planStart']) || empty($current['planEnd']));
+
                 foreach ($db['orders'] as $otherSpk => $other) {
                     if ($otherSpk === $spk || !is_array($other) || ($other['st'] ?? '') !== 'Dispatch' || ($other['tgl'] ?? '') !== ($payload['tgl'] ?? '')) continue;
                     if (($other['drv'] ?? '') !== ($payload['drv'] ?? '') && ($other['trk'] ?? '') !== ($payload['trk'] ?? '')) continue;
@@ -399,6 +406,7 @@ if ($action === 'saveOrder') {
                     $otherStart = $otherStartValid ? DateTime::createFromFormat('!H:i', $otherStartRaw) : false;
                     $otherEnd = $otherEndValid ? DateTime::createFromFormat('!H:i', $otherEndRaw) : false;
                     if (!$otherStart || !$otherEnd) {
+                        if ($isLegacyScheduleRepair) continue;
                         jsonOut(['ok' => false, 'error' => 'Ada SPK aktif pada tanggal ini tanpa jadwal terperinci. Lengkapi jadwal SPK tersebut terlebih dahulu.'], 409);
                     }
                     $os = ((int)$otherStart->format('H')) * 60 + (int)$otherStart->format('i');
