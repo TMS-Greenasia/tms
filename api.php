@@ -349,28 +349,48 @@ if ($action === 'saveOrder') {
         $db['orders'][$spk] = $existing;
     } else {
         $current = $db['orders'][$spk] ?? null;
-        $isDispatching = (($payload['st'] ?? '') === 'Dispatch') && (!is_array($current) || ($current['st'] ?? '') !== 'Dispatch');
-        if (($payload['st'] ?? '') === 'Dispatch' && !empty($payload['drv']) && !empty($payload['trk'])) {
+        $isDispatch = (($payload['st'] ?? '') === 'Dispatch');
+        $isDispatching = $isDispatch && (!is_array($current) || ($current['st'] ?? '') !== 'Dispatch');
+        if ($isDispatch) {
+            if (empty($payload['drv']) || empty($payload['trk'])) {
+                jsonOut(['ok' => false, 'error' => 'SPK Dispatch wajib memiliki driver dan unit.'], 400);
+            }
+
             $startRaw = (string)($payload['planStart'] ?? '');
             $endRaw = (string)($payload['planEnd'] ?? '');
             $validStart = preg_match('/^(?:[01]\\d|2[0-3]):[0-5]\\d$/', $startRaw) === 1;
             $validEnd = preg_match('/^(?:[01]\\d|2[0-3]):[0-5]\\d$/', $endRaw) === 1;
             $startTime = $validStart ? DateTime::createFromFormat('!H:i', $startRaw) : false;
             $endTime = $validEnd ? DateTime::createFromFormat('!H:i', $endRaw) : false;
-            if ($isDispatching && (!$startTime || !$endTime)) {
-                jsonOut(['ok' => false, 'error' => 'SPK baru yang di-dispatch wajib memiliki jadwal mulai dan selesai.'], 400);
-            }
-            if ($startTime && $endTime) {
+
+            $sameLegacySchedule = is_array($current)
+                && ($current['st'] ?? '') === 'Dispatch'
+                && ($current['drv'] ?? '') === ($payload['drv'] ?? '')
+                && ($current['trk'] ?? '') === ($payload['trk'] ?? '')
+                && ($current['tgl'] ?? '') === ($payload['tgl'] ?? '')
+                && ($current['planStart'] ?? '') === $startRaw
+                && ($current['planEnd'] ?? '') === $endRaw;
+
+            if (!$startTime || !$endTime) {
+                if (!$sameLegacySchedule) {
+                    jsonOut(['ok' => false, 'error' => 'SPK Dispatch wajib memiliki jam rencana valid. Lengkapi jam mulai dan selesai.'], 400);
+                }
+            } else {
                 $startMinute = ((int)$startTime->format('H')) * 60 + (int)$startTime->format('i');
                 $endMinute = ((int)$endTime->format('H')) * 60 + (int)$endTime->format('i');
                 if ($endMinute <= $startMinute) {
                     jsonOut(['ok' => false, 'error' => 'Jam selesai harus setelah jam mulai pada tanggal muat yang sama.'], 400);
                 }
+
                 foreach ($db['orders'] as $otherSpk => $other) {
                     if ($otherSpk === $spk || !is_array($other) || ($other['st'] ?? '') !== 'Dispatch' || ($other['tgl'] ?? '') !== ($payload['tgl'] ?? '')) continue;
                     if (($other['drv'] ?? '') !== ($payload['drv'] ?? '') && ($other['trk'] ?? '') !== ($payload['trk'] ?? '')) continue;
-                    $otherStart = DateTime::createFromFormat('!H:i', (string)($other['planStart'] ?? ''));
-                    $otherEnd = DateTime::createFromFormat('!H:i', (string)($other['planEnd'] ?? ''));
+                    $otherStartRaw = (string)($other['planStart'] ?? '');
+                    $otherEndRaw = (string)($other['planEnd'] ?? '');
+                    $otherStartValid = preg_match('/^(?:[01]\\d|2[0-3]):[0-5]\\d$/', $otherStartRaw) === 1;
+                    $otherEndValid = preg_match('/^(?:[01]\\d|2[0-3]):[0-5]\\d$/', $otherEndRaw) === 1;
+                    $otherStart = $otherStartValid ? DateTime::createFromFormat('!H:i', $otherStartRaw) : false;
+                    $otherEnd = $otherEndValid ? DateTime::createFromFormat('!H:i', $otherEndRaw) : false;
                     if (!$otherStart || !$otherEnd) {
                         jsonOut(['ok' => false, 'error' => 'Ada SPK aktif pada tanggal ini tanpa jadwal terperinci. Lengkapi jadwal SPK tersebut terlebih dahulu.'], 409);
                     }
