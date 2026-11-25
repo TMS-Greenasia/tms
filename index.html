@@ -1856,7 +1856,7 @@
     function openO(n) {
       const o = gO(n), j = o.jenis || 'Import', i = ST.indexOf(o.st), bt = o.st == 'Batal';
       const canEdit = isSA() || o.st === 'Booking';
-      const canAssign = isSA() || ['Booking', 'Dispatch'].includes(o.st);
+      const canAssign = isSA() || (me.role === 'admin' && ['Booking', 'Dispatch'].includes(o.st));
       const r = rt(j, o.term || o.a, o.t, o.depo, o.repoDir), sg = r ? r.u[TIPE.indexOf(o.tipe)] : 0, ph = o.photos || {};
       const srcTxt = fmtSrcOrder(o);
 
@@ -1960,8 +1960,8 @@
     }
 
     async function uSched(n) {
-      if (!canAssign) return showToast('Akses ditolak untuk mengubah jadwal.');
       const o = gO(n);
+      if (!(isSA() || (me.role === 'admin' && o.st === 'Dispatch'))) return showToast('Akses ditolak untuk mengubah jadwal.');
       const start = $('sched_start_' + n).value;
       const end = $('sched_end_' + n).value;
       const valid = t => /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(t || '');
