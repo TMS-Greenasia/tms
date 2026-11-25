@@ -1916,7 +1916,7 @@
           <select ${canAssign ? '' : 'disabled'} onchange="uF('${E(n)}','drv',this.value)">
             <option value="">– pilih driver –</option>
             ${M.drivers.map(d => {
-              const b = busy('drv', d.id, o.tgl, o.spk, j);
+              const b = busy('drv', d.id, o.tgl, o.spk, j, o.planStart || '08:00', o.planHours || 4);
               return `<option value="${E(d.id)}" ${o.drv == d.id ? 'selected' : ''} ${b ? 'disabled' : ''}>${E(d.n)} (${E(d.plat)})${b ? ' — sedang ' + b.spk : ''}</option>`;
             }).join('')}
           </select>
@@ -1925,7 +1925,7 @@
           <select ${canAssign ? '' : 'disabled'} onchange="uF('${E(n)}','trk',this.value)">
             <option value="">– pilih no. polisi –</option>
             ${M.trucks.map(t => {
-              const b = busy('trk', t.plat, o.tgl, o.spk, j);
+              const b = busy('trk', t.plat, o.tgl, o.spk, j, o.planStart || '08:00', o.planHours || 4);
               return `<option value="${E(t.plat)}" ${o.trk == t.plat ? 'selected' : ''} ${b ? 'disabled' : ''}>${E(t.plat)} (${E(t.jenis)})${b ? ' — sedang ' + b.spk : ''}</option>`;
             }).join('')}
           </select>
@@ -1957,7 +1957,7 @@
       o[k] = v;
       if (k == 'drv') {
         const d = drvObj(v);
-        if (d && d.plat && !busy('trk', d.plat, o.tgl, o.spk, o.jenis)) o.trk = d.plat;
+        if (d && d.plat && !busy('trk', d.plat, o.tgl, o.spk, o.jenis, o.planStart || '08:00', o.planHours || 4)) o.trk = d.plat;
         if (o.st === 'Dispatch') { o.seen = false; o.accepted = false; }
       }
       po(o);
@@ -1974,8 +1974,8 @@
       const o = gO(n);
       if (o.st === 'Booking') {
         if (!o.drv || !o.trk) return showToast('Pilih driver dan no. polisi unit dulu sebelum dispatch.');
-        if (busy('drv', o.drv, o.tgl, n, o.jenis) || busy('trk', o.trk, o.tgl, n, o.jenis)) {
-          return showToast('Driver atau unit sudah dipakai order lain di tanggal itu (kecuali Repo Container).');
+        if (busy('drv', o.drv, o.tgl, n, o.jenis, o.planStart || '08:00', o.planHours || 4) || busy('trk', o.trk, o.tgl, n, o.jenis, o.planStart || '08:00', o.planHours || 4)) {
+          return showToast('Jadwal driver atau unit bentrok. Periksa jam rencana SPK.');
         }
         sync(o);
         o.seen = false;
