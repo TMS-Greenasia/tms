@@ -348,6 +348,37 @@ if ($action === 'saveOrder') {
         $existing['seen'] = true;
         $db['orders'][$spk] = $existing;
     } else {
+        $current = $db['orders'][$spk] ?? null;
+        if (($payload['st'] ?? '') === 'Dispatch' && !empty($payload['drv']) && !empty($payload['trk'])) {
+            $startRaw = (string)($payload['planStart'] ?? '');
+            $endRaw = (string)($payload['planEnd'] ?? '');
+            $startTime = DateTime::createFromFormat('!H:i', $startRaw);
+            $endTime = DateTime::createFromFormat('!H:i', $endRaw);
+            if (!$current && (!$startTime || !$endTime)) {
+                jsonOut(['ok' => false, 'error' => 'SPK baru yang di-dispatch wajib memiliki jadwal mulai dan selesai.'], 400);
+            }
+            if ($startTime && $endTime) {
+                $startMinute = ((int)$startTime->format('H')) * 60 + (int)$startTime->format('i');
+                $endMinute = ((int)$endTime->format('H')) * 60 + (int)$endTime->format('i');
+                if ($endMinute <= $startMinute) {
+                    jsonOut(['ok' => false, 'error' => 'Jam selesai harus setelah jam mulai pada tanggal muat yang sama.'], 400);
+                }
+                foreach ($db['orders'] as $otherSpk => $other) {
+                    if ($otherSpk === $spk || !is_array($other) || ($other['st'] ?? '') !== 'Dispatch' || ($other['tgl'] ?? '') !== ($payload['tgl'] ?? '')) continue;
+                    if (($other['drv'] ?? '') !== ($payload['drv'] ?? '') && ($other['trk'] ?? '') !== ($payload['trk'] ?? '')) continue;
+                    $otherStart = DateTime::createFromFormat('!H:i', (string)($other['planStart'] ?? ''));
+                    $otherEnd = DateTime::createFromFormat('!H:i', (string)($other['planEnd'] ?? ''));
+                    if (!$otherStart || !$otherEnd) {
+                        jsonOut(['ok' => false, 'error' => 'Ada SPK aktif pada tanggal ini tanpa jadwal terperinci. Lengkapi jadwal SPK tersebut terlebih dahulu.'], 409);
+                    }
+                    $os = ((int)$otherStart->format('H')) * 60 + (int)$otherStart->format('i');
+                    $oe = ((int)$otherEnd->format('H')) * 60 + (int)$otherEnd->format('i');
+                    if ($startMinute < $oe && $os < $endMinute) {
+                        jsonOut(['ok' => false, 'error' => 'Jadwal bentrok dengan SPK ' . $otherSpk . '.'], 409);
+                    }
+                }
+            }
+        }
         $db['orders'][$spk] = $payload;
     }
 
