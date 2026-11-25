@@ -357,6 +357,9 @@ if ($action === 'saveOrder') {
     } else {
         $current = $db['orders'][$spk] ?? null;
         $isDispatch = (($payload['st'] ?? '') === 'Dispatch');
+        if ($isDispatch && !in_array(($user['role'] ?? ''), ['admin', 'superadmin'], true)) {
+            jsonOut(['ok' => false, 'error' => 'Hanya Admin Ops atau Superadmin yang dapat mengatur SPK Dispatch.'], 403);
+        }
         $isDispatching = $isDispatch && (!is_array($current) || ($current['st'] ?? '') !== 'Dispatch');
         if ($isDispatch) {
             if (empty($payload['drv']) || empty($payload['trk'])) {
