@@ -308,6 +308,13 @@ if ($action === 'saveOrder') {
     $spk = trim((string)($payload['spk'] ?? ''));
     if (!$spk) jsonOut(['ok' => false, 'error' => 'Nomor SPK tidak valid.'], 400);
 
+    // Serialize order writes so two simultaneous dispatches cannot both pass the overlap check.
+    $writeLock = fopen($DB_FILE . '.write.lock', 'c');
+    if (!$writeLock || !flock($writeLock, LOCK_EX)) {
+        if (is_resource($writeLock)) fclose($writeLock);
+        jsonOut(['ok' => false, 'error' => 'Tidak dapat mengunci penyimpanan order. Coba kembali.'], 500);
+    }
+
     $db = loadJsonFile($DB_FILE, fn() => defaultSeed());
     if (!is_array($db['orders'])) $db['orders'] = [];
 
@@ -406,6 +413,8 @@ if ($action === 'saveOrder') {
     }
 
     saveJsonFile($DB_FILE, $db);
+    flock($writeLock, LOCK_UN);
+    fclose($writeLock);
     jsonOut(['ok' => true]);
 }
 
