@@ -1787,7 +1787,7 @@
       const startMatch = planStart.match(/^(\d{2}):(\d{2})$/);
       const startMinutes = startMatch ? (+startMatch[1] * 60 + +startMatch[2]) : -1;
       const endMinutes = startMinutes + Math.round(planHours * 60);
-      if (startMinutes < 0 || startMinutes >= 1440 || planHours < 0.5 || planHours > 24 || endMinutes > 1440) return showToast('Jam mulai atau estimasi durasi tidak valid.');
+      if (startMinutes < 0 || startMinutes >= 1440 || planHours < 0.5 || planHours > 24 || endMinutes >= 1440) return showToast('Jam mulai atau estimasi durasi tidak valid.');
       const planEnd = String(Math.floor(endMinutes / 60)).padStart(2, '0') + ':' + String(endMinutes % 60).padStart(2, '0');
 
       if (!cust || !term || !depo || (jenis !== 'Repo' && !t)) {
