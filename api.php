@@ -307,9 +307,50 @@ if ($action === 'saveOrder') {
     $user = requireAuth($SESS_FILE);
     $spk = trim((string)($payload['spk'] ?? ''));
     if (!$spk) jsonOut(['ok' => false, 'error' => 'Nomor SPK tidak valid.'], 400);
+
     $db = loadJsonFile($DB_FILE, fn() => defaultSeed());
     if (!is_array($db['orders'])) $db['orders'] = [];
-    $db['orders'][$spk] = $payload;
+
+    if (($user['role'] ?? '') === 'driver') {
+        $existing = $db['orders'][$spk] ?? null;
+        if (!is_array($existing)) jsonOut(['ok' => false, 'error' => 'Order tidak ditemukan.'], 404);
+        if (($existing['drv'] ?? '') !== ($user['id'] ?? '')) {
+            jsonOut(['ok' => false, 'error' => 'Order ini tidak ditugaskan kepada Anda.'], 403);
+        }
+        if (($existing['st'] ?? '') !== 'Dispatch') {
+            jsonOut(['ok' => false, 'error' => 'Order tidak lagi aktif untuk driver.'], 409);
+        }
+
+        // Driver may update only operational fields; assignment and booking data remain server-owned.
+        $allowed = ['photos', 'drvStep', 'drvCond', 'drvReport', 'pod', 'tiba', 'completedAt', 'finishedAt', 'seen'];
+        foreach ($allowed as $field) {
+            if (array_key_exists($field, $payload)) {
+                $existing[$field] = $payload[$field];
+            }
+        }
+
+        if (($existing['accepted'] ?? false) !== true) {
+            $existing['accepted'] = true;
+            $existing['acceptedAt'] = date('d/m/Y H:i:s') . ' WIB';
+        }
+
+        if (($payload['st'] ?? '') === 'Selesai') {
+            $pod = $existing['photos']['pod'] ?? '';
+            if (!is_string($pod) || $pod === '') {
+                jsonOut(['ok' => false, 'error' => 'Foto POD wajib tersimpan sebelum order diselesaikan.'], 400);
+            }
+            if (($existing['drvCond'] ?? 'Lancar') !== 'Lancar' && trim((string)($existing['drvReport'] ?? '')) === '') {
+                jsonOut(['ok' => false, 'error' => 'Report kendala wajib diisi sebelum order diselesaikan.'], 400);
+            }
+            $existing['st'] = 'Selesai';
+        }
+
+        $existing['seen'] = true;
+        $db['orders'][$spk] = $existing;
+    } else {
+        $db['orders'][$spk] = $payload;
+    }
+
     saveJsonFile($DB_FILE, $db);
     jsonOut(['ok' => true]);
 }
