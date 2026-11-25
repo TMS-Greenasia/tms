@@ -2206,18 +2206,12 @@
 
       const card = (o, idx) => {
         if (o.drvStep === 'upload' || o.drvStep === 'note') return renderWizard(o);
-        const j = o.jenis || 'Import', isFirst = idx === 0, acc = o.accepted !== false;
-        if (!isFirst) {
-          return `<div class="dc locked">
-            <div class="row"><b>${E(o.spk)}</b> <span class="tag ${jClass(j)}">${E(jLabel(j))}</span> <span class="tag">🔒 Antrean Order #${idx + 1}</span><span style="margin-left:auto">Muat ${E(o.tgl)}</span></div>
-            <p class="hint" style="margin:8px 0 0"><b>${E(o.cust)}</b> · Alur: ${E(fmtRute(o))}<br><i>Order ini otomatis terbuka setelah order aktif di atas (<b>${E(run[0].spk)}</b>) selesai.</i></p>
-          </div>`;
-        }
+        const j = o.jenis || 'Import', acc = o.accepted !== false;
         return `<div class="dc ${!o.seen || !acc ? 'new' : ''}">
           <div class="row">
             <b>${E(o.spk)}</b>
             <span class="tag ${jClass(j)}">${E(jLabel(j))}</span>
-            <span class="tag st-Dispatch">${acc ? 'Sedang Berjalan' : 'Order Baru Masuk'}</span>
+            <span class="tag st-Dispatch">${acc ? 'Order Diterima' : 'Order Berikutnya'}</span>
             ${!o.seen ? '<span class="bell">BARU</span>' : ''}
             <span style="margin-left:auto">Muat ${E(o.tgl)}</span>
           </div>
@@ -2226,6 +2220,7 @@
           <p>Uang jalan: <b>${R(o.uj)}</b></p>
           ${renderDocAttachmentBlock(o, true)}
           <div class="row" style="margin-top:8px">${j == 'Import' ? T(o, 'term', '1. Terminal (Muat)', '') + T(o, 'depo', '3. Depo Empty (Kembali)', 't2') : j == 'Export' ? T(o, 'depo', '1. Depo Empty (Ambil)', 't2') + T(o, 'term', '3. Terminal (Bongkar)', '') : T(o, 'term', 'Terminal', '') + T(o, 'depo', 'Depo Empty', 't2')}</div>
+          ${acc ? '<p class="hint" style="margin:8px 0 0"><b>Order sudah diterima. Menunggu order selanjutnya.</b></p>' : ''}
           <div class="row" style="margin-top:12px">
             ${!acc ? `<button class="b" onclick="acceptO('${E(o.spk)}')">✅ Terima Order Ini</button>` : `<button class="b o" onclick="startFinishOrder('${E(o.spk)}')">✅ Selesaikan Order</button>`}
             ${!o.seen && acc ? `<button class="b g" onclick="seen('${E(o.spk)}')">Tandai dibaca</button>` : ''}
@@ -2245,7 +2240,7 @@
       const o = gO(n);
       o.accepted = true; o.seen = true; o.acceptedAt = nowWib();
       po(o); rr();
-      showToast(`Order ${n} diterima! Silakan cek file & rute.`);
+      showToast(`Order ${n} diterima. Order sudah diterima, menunggu order selanjutnya.`);
     }
 
     function seen(n) { const o = gO(n); o.seen = true; po(o); }
