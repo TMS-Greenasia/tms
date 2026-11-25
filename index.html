@@ -1040,7 +1040,7 @@
 
     const busy = (k, v, tgl, ex, jenis, planStart = '08:00', planHours = 4) => {
       if (!v) return null;
-      const toMin = t => { const m = String(t || '').match(/^(\\d{2}):(\\d{2})$/); return m ? (+m[1] * 60 + +m[2]) : null; };
+      const toMin = t => { const m = String(t || '').match(/^(\d{2}):(\d{2})$/); return m ? (+m[1] * 60 + +m[2]) : null; };
       const start = toMin(planStart), end = start === null ? null : start + Math.round((+planHours || 4) * 60);
       return ALL().find(o => {
         if (o.st !== 'Dispatch' || o.spk == ex || o.tgl !== tgl || o[k] !== v) return false;
@@ -1690,7 +1690,7 @@
       const planHours = $('f_plan_hours') ? +$('f_plan_hours').value || 4 : 4;
       if (drvId) {
         const d = drvObj(drvId);
-        if (d && d.plat && !busy('trk', d.plat, tgl, '', jenis)) {
+        if (d && d.plat && !busy('trk', d.plat, tgl, '', jenis, planStart, planHours)) {
           $('bk_trk_wrap').innerHTML = buildTruckSelectHtml('f_trk', d.plat, tgl, jenis, '', '', planStart, planHours);
         }
       }
@@ -1784,7 +1784,7 @@
       const tgl = v('tgl');
       const planStart = v('plan_start') || '08:00';
       const planHours = +v('plan_hours') || 4;
-      const startMatch = planStart.match(/^(\\d{2}):(\\d{2})$/);
+      const startMatch = planStart.match(/^(\d{2}):(\d{2})$/);
       const startMinutes = startMatch ? (+startMatch[1] * 60 + +startMatch[2]) : -1;
       const endMinutes = startMinutes + Math.round(planHours * 60);
       if (startMinutes < 0 || startMinutes >= 1440 || planHours < 0.5 || planHours > 24 || endMinutes > 1440) return showToast('Jam mulai atau estimasi durasi tidak valid.');
