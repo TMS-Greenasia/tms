@@ -1,0 +1,43 @@
+name: Feature syntax checks
+
+on:
+  pull_request:
+    paths:
+      - 'api.php'
+      - 'index.html'
+      - '.github/workflows/feature-syntax-check.yml'
+  push:
+    branches:
+      - feature/driver-multi-spk-same-day
+    paths:
+      - 'api.php'
+      - 'index.html'
+      - '.github/workflows/feature-syntax-check.yml'
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: Check PHP syntax
+        run: php -l api.php
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Extract inline JavaScript and check syntax
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('index.html', 'utf8');
+          const blocks = [...html.matchAll(/<script\\b[^>]*>([\\s\\S]*?)<\\/script>/gi)]
+            .map(m => m[1])
+            .filter(code => code.trim().length > 0);
+          if (!blocks.length) throw new Error('No inline JavaScript found in index.html');
+          fs.writeFileSync('/tmp/greenasia-inline.js', blocks[blocks.length - 1]);
+          NODE
+          node --check /tmp/greenasia-inline.js
