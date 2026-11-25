@@ -1038,10 +1038,16 @@
         || M.routes.find(r => (r.jenis || 'Import') == jenis && r.t == t);
     };
 
-    const busy = (k, v, tgl, ex, jenis) => {
+    const busy = (k, v, tgl, ex, jenis, planStart = '08:00', planHours = 4) => {
       if (!v) return null;
-      if (jenis === 'Repo') return null;
-      return ALL().find(o => o.st == 'Dispatch' && o.spk != ex && o.tgl == tgl && o[k] == v);
+      const toMin = t => { const m = String(t || '').match(/^(\d{2}):(\d{2})$/); return m ? (+m[1] * 60 + +m[2]) : null; };
+      const start = toMin(planStart), end = start === null ? null : start + Math.round((+planHours || 4) * 60);
+      return ALL().find(o => {
+        if (o.st !== 'Dispatch' || o.spk == ex || o.tgl !== tgl || o[k] !== v) return false;
+        const os = toMin(o.planStart), oe = toMin(o.planEnd);
+        if (os === null || oe === null || start === null || end === null) return true;
+        return start < oe && os < end;
+      });
     };
 
     const unseen = () => ALL().filter(o => o.st == 'Dispatch' && o.drv == me.id && !o.seen);
@@ -1575,21 +1581,21 @@
        ========================================================================= */
     const dl = (id, v) => `<datalist id="${id}">${[...new Set(v.filter(Boolean))].map(x => `<option value="${E(x)}">`).join('')}</datalist>`;
 
-    function buildDriverSelectHtml(id, selectedDrvId, tgl, jenis, exSpk = '', onchangeFn = 'onBkDriverChange()') {
+    function buildDriverSelectHtml(id, selectedDrvId, tgl, jenis, exSpk = '', onchangeFn = 'onBkDriverChange()', planStart = '08:00', planHours = 4) {
       return `<select id="${id}" onchange="${onchangeFn}">
         <option value="">– pilih driver (melekat no. polisi) –</option>
         ${M.drivers.map(d => {
-          const b = busy('drv', d.id, tgl, exSpk, jenis);
+          const b = busy('drv', d.id, tgl, exSpk, jenis, planStart, planHours);
           return `<option value="${E(d.id)}" ${selectedDrvId == d.id ? 'selected' : ''} ${b ? 'disabled' : ''}>${E(d.n)} (${E(d.plat)})${b ? ' — sedang ' + b.spk : ''}</option>`;
         }).join('')}
       </select>`;
     }
 
-    function buildTruckSelectHtml(id, selectedPlat, tgl, jenis, exSpk = '', onchangeFn = '') {
+    function buildTruckSelectHtml(id, selectedPlat, tgl, jenis, exSpk = '', onchangeFn = '', planStart = '08:00', planHours = 4) {
       return `<select id="${id}" ${onchangeFn ? `onchange="${onchangeFn}"` : ''}>
         <option value="">– pilih no. polisi unit –</option>
         ${M.trucks.map(t => {
-          const b = busy('trk', t.plat, tgl, exSpk, jenis);
+          const b = busy('trk', t.plat, tgl, exSpk, jenis, planStart, planHours);
           return `<option value="${E(t.plat)}" ${selectedPlat == t.plat ? 'selected' : ''} ${b ? 'disabled' : ''}>${E(t.plat)} (${E(t.jenis)})${b ? ' — sedang ' + b.spk : ''}</option>`;
         }).join('')}
       </select>`;
@@ -1614,6 +1620,8 @@
         </select></label>
         <label>Customer / Pemilik Order<input id="f_cust" list="lc" oninput="fs()">${dl('lc', M.custs)}</label>
         <label style="max-width:160px">Tanggal muat<input type="date" id="f_tgl" value="${defTgl}" onchange="refreshBkFleetAndAssign()"></label>
+        <label style="max-width:130px">Rencana mulai<input type="time" id="f_plan_start" value="08:00" onchange="refreshBkFleetAndAssign()"></label>
+        <label style="max-width:150px">Estimasi durasi (jam)<input type="number" id="f_plan_hours" min="0.5" max="24" step="0.5" value="4" onchange="refreshBkFleetAndAssign()"></label>
         <label style="max-width:160px">Tipe trailer<select id="f_tipe" onchange="fs()">${TIPE.map(t => `<option>${t}</option>`).join('')}</select></label>
       </div>
 
@@ -1678,10 +1686,12 @@
       const drvId = $('f_drv') ? $('f_drv').value : '';
       const tgl = $('f_tgl') ? $('f_tgl').value : today();
       const jenis = $('f_jenis') ? $('f_jenis').value : 'Import';
+      const planStart = $('f_plan_start') ? $('f_plan_start').value : '08:00';
+      const planHours = $('f_plan_hours') ? +$('f_plan_hours').value || 4 : 4;
       if (drvId) {
         const d = drvObj(drvId);
-        if (d && d.plat && !busy('trk', d.plat, tgl, '', jenis)) {
-          $('bk_trk_wrap').innerHTML = buildTruckSelectHtml('f_trk', d.plat, tgl, jenis);
+        if (d && d.plat && !busy('trk', d.plat, tgl, '', jenis, planStart, planHours)) {
+          $('bk_trk_wrap').innerHTML = buildTruckSelectHtml('f_trk', d.plat, tgl, jenis, '', '', planStart, planHours);
         }
       }
     }
@@ -1691,8 +1701,10 @@
       const jenis = $('f_jenis') ? $('f_jenis').value : 'Import';
       const curDrv = $('f_drv') ? $('f_drv').value : '';
       const curTrk = $('f_trk') ? $('f_trk').value : '';
-      if ($('bk_drv_wrap')) $('bk_drv_wrap').innerHTML = buildDriverSelectHtml('f_drv', curDrv, tgl, jenis);
-      if ($('bk_trk_wrap')) $('bk_trk_wrap').innerHTML = buildTruckSelectHtml('f_trk', curTrk, tgl, jenis);
+      const planStart = $('f_plan_start') ? $('f_plan_start').value : '08:00';
+      const planHours = $('f_plan_hours') ? +$('f_plan_hours').value || 4 : 4;
+      if ($('bk_drv_wrap')) $('bk_drv_wrap').innerHTML = buildDriverSelectHtml('f_drv', curDrv, tgl, jenis, '', 'onBkDriverChange()', planStart, planHours);
+      if ($('bk_trk_wrap')) $('bk_trk_wrap').innerHTML = buildTruckSelectHtml('f_trk', curTrk, tgl, jenis, '', '', planStart, planHours);
 
       const { activeList, standbyList } = getFleetStatus(tgl);
       if ($('bk_fleet_panel')) {
@@ -1706,8 +1718,10 @@
     function applyFleetToBk(drvId, plat) {
       const tgl = $('f_tgl') ? $('f_tgl').value : today();
       const jenis = $('f_jenis') ? $('f_jenis').value : 'Import';
-      if (drvId && $('bk_drv_wrap')) $('bk_drv_wrap').innerHTML = buildDriverSelectHtml('f_drv', drvId, tgl, jenis);
-      if (plat && $('bk_trk_wrap')) $('bk_trk_wrap').innerHTML = buildTruckSelectHtml('f_trk', plat, tgl, jenis);
+      const planStart = $('f_plan_start') ? $('f_plan_start').value : '08:00';
+      const planHours = $('f_plan_hours') ? +$('f_plan_hours').value || 4 : 4;
+      if (drvId && $('bk_drv_wrap')) $('bk_drv_wrap').innerHTML = buildDriverSelectHtml('f_drv', drvId, tgl, jenis, '', 'onBkDriverChange()', planStart, planHours);
+      if (plat && $('bk_trk_wrap')) $('bk_trk_wrap').innerHTML = buildTruckSelectHtml('f_trk', plat, tgl, jenis, '', '', planStart, planHours);
       showToast(`Unit ${plat || '-'} dipilih untuk booking ini.`);
     }
 
@@ -1768,6 +1782,13 @@
       const drv = v('drv');
       let trk = v('trk');
       const tgl = v('tgl');
+      const planStart = v('plan_start') || '08:00';
+      const planHours = +v('plan_hours') || 4;
+      const startMatch = planStart.match(/^(\d{2}):(\d{2})$/);
+      const startMinutes = startMatch ? (+startMatch[1] * 60 + +startMatch[2]) : -1;
+      const endMinutes = startMinutes + Math.round(planHours * 60);
+      if (startMinutes < 0 || startMinutes >= 1440 || planHours < 0.5 || planHours > 24 || endMinutes >= 1440) return showToast('Jam mulai atau estimasi durasi tidak valid.');
+      const planEnd = String(Math.floor(endMinutes / 60)).padStart(2, '0') + ':' + String(endMinutes % 60).padStart(2, '0');
 
       if (!cust || !term || !depo || (jenis !== 'Repo' && !t)) {
         return showToast('Lengkapi Customer dan seluruh titik rute.');
@@ -1779,8 +1800,8 @@
       if (directDispatch && (!drv || !trk)) {
         return showToast('Pilih Driver dan No. Polisi sebelum Dispatch langsung.');
       }
-      if (busy('drv', drv, tgl, '', jenis) || busy('trk', trk, tgl, '', jenis)) {
-        return showToast('Driver atau unit sudah dipakai order lain di tanggal itu (kecuali Repo Container).');
+      if (busy('drv', drv, tgl, '', jenis, planStart, planHours) || busy('trk', trk, tgl, '', jenis, planStart, planHours)) {
+        return showToast('Jadwal driver atau unit bentrok. Pilih jam atau armada lain.');
       }
 
       const tipe = v('tipe'), i = TIPE.indexOf(tipe), r = rt(jenis, term, t, depo, repoDir);
@@ -1790,6 +1811,7 @@
       const o = {
         spk: nextSpk(), jenis, repoDir: jenis === 'Repo' ? repoDir : '',
         tgl, createdAt: ts,
+        planStart, planEnd, planHours,
         dispatchedAt: directDispatch ? ts : '',
         cust,
         srcOrder: { nama: v('src_nama'), telp: v('src_telp'), perusahaan: v('src_pt') },
@@ -1834,7 +1856,7 @@
     function openO(n) {
       const o = gO(n), j = o.jenis || 'Import', i = ST.indexOf(o.st), bt = o.st == 'Batal';
       const canEdit = isSA() || o.st === 'Booking';
-      const canAssign = isSA() || ['Booking', 'Dispatch'].includes(o.st);
+      const canAssign = isSA() || (me.role === 'admin' && ['Booking', 'Dispatch'].includes(o.st));
       const r = rt(j, o.term || o.a, o.t, o.depo, o.repoDir), sg = r ? r.u[TIPE.indexOf(o.tipe)] : 0, ph = o.photos || {};
       const srcTxt = fmtSrcOrder(o);
 
@@ -1888,13 +1910,20 @@
         </div>
       </div>
 
+      ${o.st === 'Dispatch' ? `<h3>Jadwal Operasional SPK</h3>
+      <div class="row">
+        <label>Jam mulai<input type="time" id="sched_start_${E(n)}" value="${E(o.planStart || '')}" ${canAssign ? '' : 'disabled'}></label>
+        <label>Jam selesai<input type="time" id="sched_end_${E(n)}" value="${E(o.planEnd || '')}" ${canAssign ? '' : 'disabled'}></label>
+        ${canAssign ? `<button class="b o" onclick="uSched('${E(n)}')">Simpan Jadwal</button>` : ''}
+      </div>
+      <p class="hint">Jadwal diperlukan untuk menghitung bentrok driver dan unit. SPK Dispatch lama bisa dilengkapi di sini.</p>` : ''}
       <h3>Dispatch, Penggantian Driver / No. Polisi & Uang Jalan</h3>
       <div class="row">
         <label>Driver (Melekat No. Polisi)
           <select ${canAssign ? '' : 'disabled'} onchange="uF('${E(n)}','drv',this.value)">
             <option value="">– pilih driver –</option>
             ${M.drivers.map(d => {
-              const b = busy('drv', d.id, o.tgl, o.spk, j);
+              const b = busy('drv', d.id, o.tgl, o.spk, j, o.planStart || '08:00', o.planHours || 4);
               return `<option value="${E(d.id)}" ${o.drv == d.id ? 'selected' : ''} ${b ? 'disabled' : ''}>${E(d.n)} (${E(d.plat)})${b ? ' — sedang ' + b.spk : ''}</option>`;
             }).join('')}
           </select>
@@ -1903,7 +1932,7 @@
           <select ${canAssign ? '' : 'disabled'} onchange="uF('${E(n)}','trk',this.value)">
             <option value="">– pilih no. polisi –</option>
             ${M.trucks.map(t => {
-              const b = busy('trk', t.plat, o.tgl, o.spk, j);
+              const b = busy('trk', t.plat, o.tgl, o.spk, j, o.planStart || '08:00', o.planHours || 4);
               return `<option value="${E(t.plat)}" ${o.trk == t.plat ? 'selected' : ''} ${b ? 'disabled' : ''}>${E(t.plat)} (${E(t.jenis)})${b ? ' — sedang ' + b.spk : ''}</option>`;
             }).join('')}
           </select>
@@ -1930,12 +1959,42 @@
       </div>`);
     }
 
+    async function uSched(n) {
+      const o = gO(n);
+      if (!(isSA() || (me.role === 'admin' && o.st === 'Dispatch'))) return showToast('Akses ditolak untuk mengubah jadwal.');
+      const start = $('sched_start_' + n).value;
+      const end = $('sched_end_' + n).value;
+      const valid = t => /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(t || '');
+      if (!valid(start) || !valid(end)) return showToast('Isi jam mulai dan jam selesai yang valid.');
+      const startMin = (+start.slice(0, 2)) * 60 + (+start.slice(3, 5));
+      const endMin = (+end.slice(0, 2)) * 60 + (+end.slice(3, 5));
+      if (endMin <= startMin) return showToast('Jam selesai harus setelah jam mulai pada tanggal muat yang sama.');
+      const previous = { planStart: o.planStart, planEnd: o.planEnd, planHours: o.planHours };
+      o.planStart = start;
+      o.planEnd = end;
+      o.planHours = (endMin - startMin) / 60;
+      if (useBackend && getApiToken()) {
+        try {
+          await apiReq('/api/orders/' + encodeURIComponent(o.spk), { method: 'PUT', body: JSON.stringify(o) });
+        } catch (e) {
+          Object.assign(o, previous);
+          lsSave(); openO(n);
+          return showToast('Jadwal ditolak server: ' + ((e && e.message) || 'Periksa bentrok SPK.'));
+        }
+        O[o.spk] = o; lsSave();
+      } else {
+        po(o);
+      }
+      openO(n);
+      showToast('Jadwal SPK diperbarui.');
+    }
+
     function uF(n, k, v) {
       const o = gO(n);
       o[k] = v;
       if (k == 'drv') {
         const d = drvObj(v);
-        if (d && d.plat && !busy('trk', d.plat, o.tgl, o.spk, o.jenis)) o.trk = d.plat;
+        if (d && d.plat && !busy('trk', d.plat, o.tgl, o.spk, o.jenis, o.planStart || '08:00', o.planHours || 4)) o.trk = d.plat;
         if (o.st === 'Dispatch') { o.seen = false; o.accepted = false; }
       }
       po(o);
@@ -1952,8 +2011,8 @@
       const o = gO(n);
       if (o.st === 'Booking') {
         if (!o.drv || !o.trk) return showToast('Pilih driver dan no. polisi unit dulu sebelum dispatch.');
-        if (busy('drv', o.drv, o.tgl, n, o.jenis) || busy('trk', o.trk, o.tgl, n, o.jenis)) {
-          return showToast('Driver atau unit sudah dipakai order lain di tanggal itu (kecuali Repo Container).');
+        if (busy('drv', o.drv, o.tgl, n, o.jenis, o.planStart || '08:00', o.planHours || 4) || busy('trk', o.trk, o.tgl, n, o.jenis, o.planStart || '08:00', o.planHours || 4)) {
+          return showToast('Jadwal driver atau unit bentrok. Periksa jam rencana SPK.');
         }
         sync(o);
         o.seen = false;
@@ -2142,7 +2201,7 @@
        ========================================================================= */
     function drv() {
       const A = ALL().filter(o => o.drv == me.id);
-      const run = byD(A.filter(o => o.st == 'Dispatch'));
+      const run = byD(A.filter(o => o.st == 'Dispatch')).sort((a, b) => (a.planStart || '99:99').localeCompare(b.planStart || '99:99') || a.spk.localeCompare(b.spk));
       const dn = A.filter(o => ['Selesai', 'Ditagih'].includes(o.st))
         .sort((a, b) => (b.finishedAt || b.completedAt || b.tiba || '').localeCompare(a.finishedAt || a.completedAt || a.tiba || ''))
         .slice(0, 8);
@@ -2206,26 +2265,21 @@
 
       const card = (o, idx) => {
         if (o.drvStep === 'upload' || o.drvStep === 'note') return renderWizard(o);
-        const j = o.jenis || 'Import', isFirst = idx === 0, acc = o.accepted !== false;
-        if (!isFirst) {
-          return `<div class="dc locked">
-            <div class="row"><b>${E(o.spk)}</b> <span class="tag ${jClass(j)}">${E(jLabel(j))}</span> <span class="tag">🔒 Antrean Order #${idx + 1}</span><span style="margin-left:auto">Muat ${E(o.tgl)}</span></div>
-            <p class="hint" style="margin:8px 0 0"><b>${E(o.cust)}</b> · Alur: ${E(fmtRute(o))}<br><i>Order ini otomatis terbuka setelah order aktif di atas (<b>${E(run[0].spk)}</b>) selesai.</i></p>
-          </div>`;
-        }
+        const j = o.jenis || 'Import', acc = o.accepted !== false;
         return `<div class="dc ${!o.seen || !acc ? 'new' : ''}">
           <div class="row">
             <b>${E(o.spk)}</b>
             <span class="tag ${jClass(j)}">${E(jLabel(j))}</span>
-            <span class="tag st-Dispatch">${acc ? 'Sedang Berjalan' : 'Order Baru Masuk'}</span>
+            <span class="tag st-Dispatch">${acc ? 'Order Diterima' : 'Order Berikutnya'}</span>
             ${!o.seen ? '<span class="bell">BARU</span>' : ''}
-            <span style="margin-left:auto">Muat ${E(o.tgl)}</span>
+            <span style="margin-left:auto">Muat ${E(o.tgl)} · Jadwal ${E(o.planStart || 'belum dijadwalkan')}–${E(o.planEnd || '-')}</span>
           </div>
           <div class="hint" style="margin-top:4px">Dispatch: ${E(o.dispatchedAt || o.tgl)}${o.acceptedAt ? ` · Diterima: ${E(o.acceptedAt)}` : ''}</div>
           <p><b>${E(o.cust)}</b><br><b>Alur Rute:</b> ${E(fmtRute(o))}<br>${E(o.tipe)} · Unit ${E(o.trk)} · Container ${E(o.cont || '-')}${o.cat ? '<br>Catatan Admin: ' + E(o.cat) : ''}</p>
           <p>Uang jalan: <b>${R(o.uj)}</b></p>
           ${renderDocAttachmentBlock(o, true)}
           <div class="row" style="margin-top:8px">${j == 'Import' ? T(o, 'term', '1. Terminal (Muat)', '') + T(o, 'depo', '3. Depo Empty (Kembali)', 't2') : j == 'Export' ? T(o, 'depo', '1. Depo Empty (Ambil)', 't2') + T(o, 'term', '3. Terminal (Bongkar)', '') : T(o, 'term', 'Terminal', '') + T(o, 'depo', 'Depo Empty', 't2')}</div>
+          ${acc ? '<p class="hint" style="margin:8px 0 0"><b>Order sudah diterima. Menunggu order selanjutnya.</b></p>' : ''}
           <div class="row" style="margin-top:12px">
             ${!acc ? `<button class="b" onclick="acceptO('${E(o.spk)}')">✅ Terima Order Ini</button>` : `<button class="b o" onclick="startFinishOrder('${E(o.spk)}')">✅ Selesaikan Order</button>`}
             ${!o.seen && acc ? `<button class="b g" onclick="seen('${E(o.spk)}')">Tandai dibaca</button>` : ''}
@@ -2241,11 +2295,29 @@
       </div>`).join('')}</div>` : ''}`;
     }
 
-    function acceptO(n) {
+    async function acceptO(n) {
       const o = gO(n);
+      if (me.role === 'driver' && o.drv !== me.id) return showToast('Bukan order Anda.');
+      const previous = { accepted: o.accepted, seen: o.seen, acceptedAt: o.acceptedAt };
       o.accepted = true; o.seen = true; o.acceptedAt = nowWib();
-      po(o); rr();
-      showToast(`Order ${n} diterima! Silakan cek file & rute.`);
+
+      if (useBackend && getApiToken()) {
+        try {
+          await apiReq('/api/orders/' + encodeURIComponent(o.spk), { method: 'PUT', body: JSON.stringify(o) });
+        } catch (e) {
+          o.accepted = previous.accepted;
+          o.seen = previous.seen;
+          o.acceptedAt = previous.acceptedAt;
+          lsSave(); rr();
+          return showToast('Gagal menerima order dari server: ' + ((e && e.message) || 'Coba lagi.'));
+        }
+        O[o.spk] = o;
+        lsSave();
+      } else {
+        po(o);
+      }
+      rr();
+      showToast(`Order ${n} diterima. Order sudah diterima. Menunggu order selanjutnya.`);
     }
 
     function seen(n) { const o = gO(n); o.seen = true; po(o); }

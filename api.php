@@ -307,10 +307,125 @@ if ($action === 'saveOrder') {
     $user = requireAuth($SESS_FILE);
     $spk = trim((string)($payload['spk'] ?? ''));
     if (!$spk) jsonOut(['ok' => false, 'error' => 'Nomor SPK tidak valid.'], 400);
+
+    // Serialize order writes so two simultaneous dispatches cannot both pass the overlap check.
+    $writeLock = fopen($DB_FILE . '.write.lock', 'c');
+    if (!$writeLock || !flock($writeLock, LOCK_EX)) {
+        if (is_resource($writeLock)) fclose($writeLock);
+        jsonOut(['ok' => false, 'error' => 'Tidak dapat mengunci penyimpanan order. Coba kembali.'], 500);
+    }
+
     $db = loadJsonFile($DB_FILE, fn() => defaultSeed());
     if (!is_array($db['orders'])) $db['orders'] = [];
-    $db['orders'][$spk] = $payload;
+
+    if (($user['role'] ?? '') === 'driver') {
+        $existing = $db['orders'][$spk] ?? null;
+        if (!is_array($existing)) jsonOut(['ok' => false, 'error' => 'Order tidak ditemukan.'], 404);
+        if (($existing['drv'] ?? '') !== ($user['id'] ?? '')) {
+            jsonOut(['ok' => false, 'error' => 'Order ini tidak ditugaskan kepada Anda.'], 403);
+        }
+        if (($existing['st'] ?? '') !== 'Dispatch') {
+            jsonOut(['ok' => false, 'error' => 'Order tidak lagi aktif untuk driver.'], 409);
+        }
+
+        // Driver may update only operational fields; assignment and booking data remain server-owned.
+        $allowed = ['photos', 'drvStep', 'drvCond', 'drvReport', 'pod', 'tiba', 'completedAt', 'finishedAt', 'seen'];
+        foreach ($allowed as $field) {
+            if (array_key_exists($field, $payload)) {
+                $existing[$field] = $payload[$field];
+            }
+        }
+
+        if (($existing['accepted'] ?? false) !== true) {
+            $existing['accepted'] = true;
+            $existing['acceptedAt'] = date('d/m/Y H:i:s') . ' WIB';
+        }
+
+        if (($payload['st'] ?? '') === 'Selesai') {
+            $pod = $existing['photos']['pod'] ?? '';
+            if (!is_string($pod) || $pod === '') {
+                jsonOut(['ok' => false, 'error' => 'Foto POD wajib tersimpan sebelum order diselesaikan.'], 400);
+            }
+            if (($existing['drvCond'] ?? 'Lancar') !== 'Lancar' && trim((string)($existing['drvReport'] ?? '')) === '') {
+                jsonOut(['ok' => false, 'error' => 'Report kendala wajib diisi sebelum order diselesaikan.'], 400);
+            }
+            $existing['st'] = 'Selesai';
+        }
+
+        $existing['seen'] = true;
+        $db['orders'][$spk] = $existing;
+    } else {
+        $current = $db['orders'][$spk] ?? null;
+        $isDispatch = (($payload['st'] ?? '') === 'Dispatch');
+        if ($isDispatch && !in_array(($user['role'] ?? ''), ['admin', 'superadmin'], true)) {
+            jsonOut(['ok' => false, 'error' => 'Hanya Admin Ops atau Superadmin yang dapat mengatur SPK Dispatch.'], 403);
+        }
+        $isDispatching = $isDispatch && (!is_array($current) || ($current['st'] ?? '') !== 'Dispatch');
+        if ($isDispatch) {
+            if (empty($payload['drv']) || empty($payload['trk'])) {
+                jsonOut(['ok' => false, 'error' => 'SPK Dispatch wajib memiliki driver dan unit.'], 400);
+            }
+
+            $startRaw = (string)($payload['planStart'] ?? '');
+            $endRaw = (string)($payload['planEnd'] ?? '');
+            $validStart = preg_match('/^(?:[01]\\d|2[0-3]):[0-5]\\d$/', $startRaw) === 1;
+            $validEnd = preg_match('/^(?:[01]\\d|2[0-3]):[0-5]\\d$/', $endRaw) === 1;
+            $startTime = $validStart ? DateTime::createFromFormat('!H:i', $startRaw) : false;
+            $endTime = $validEnd ? DateTime::createFromFormat('!H:i', $endRaw) : false;
+
+            $sameLegacySchedule = is_array($current)
+                && ($current['st'] ?? '') === 'Dispatch'
+                && ($current['drv'] ?? '') === ($payload['drv'] ?? '')
+                && ($current['trk'] ?? '') === ($payload['trk'] ?? '')
+                && ($current['tgl'] ?? '') === ($payload['tgl'] ?? '')
+                && ($current['planStart'] ?? '') === $startRaw
+                && ($current['planEnd'] ?? '') === $endRaw;
+
+            if (!$startTime || !$endTime) {
+                if (!$sameLegacySchedule) {
+                    jsonOut(['ok' => false, 'error' => 'SPK Dispatch wajib memiliki jam rencana valid. Lengkapi jam mulai dan selesai.'], 400);
+                }
+            } else {
+                $startMinute = ((int)$startTime->format('H')) * 60 + (int)$startTime->format('i');
+                $endMinute = ((int)$endTime->format('H')) * 60 + (int)$endTime->format('i');
+                if ($endMinute <= $startMinute) {
+                    jsonOut(['ok' => false, 'error' => 'Jam selesai harus setelah jam mulai pada tanggal muat yang sama.'], 400);
+                }
+
+                $isLegacyScheduleRepair = is_array($current)
+                    && ($current['st'] ?? '') === 'Dispatch'
+                    && ($current['drv'] ?? '') === ($payload['drv'] ?? '')
+                    && ($current['trk'] ?? '') === ($payload['trk'] ?? '')
+                    && ($current['tgl'] ?? '') === ($payload['tgl'] ?? '')
+                    && (empty($current['planStart']) || empty($current['planEnd']));
+
+                foreach ($db['orders'] as $otherSpk => $other) {
+                    if ($otherSpk === $spk || !is_array($other) || ($other['st'] ?? '') !== 'Dispatch' || ($other['tgl'] ?? '') !== ($payload['tgl'] ?? '')) continue;
+                    if (($other['drv'] ?? '') !== ($payload['drv'] ?? '') && ($other['trk'] ?? '') !== ($payload['trk'] ?? '')) continue;
+                    $otherStartRaw = (string)($other['planStart'] ?? '');
+                    $otherEndRaw = (string)($other['planEnd'] ?? '');
+                    $otherStartValid = preg_match('/^(?:[01]\\d|2[0-3]):[0-5]\\d$/', $otherStartRaw) === 1;
+                    $otherEndValid = preg_match('/^(?:[01]\\d|2[0-3]):[0-5]\\d$/', $otherEndRaw) === 1;
+                    $otherStart = $otherStartValid ? DateTime::createFromFormat('!H:i', $otherStartRaw) : false;
+                    $otherEnd = $otherEndValid ? DateTime::createFromFormat('!H:i', $otherEndRaw) : false;
+                    if (!$otherStart || !$otherEnd) {
+                        if ($isLegacyScheduleRepair) continue;
+                        jsonOut(['ok' => false, 'error' => 'Ada SPK aktif pada tanggal ini tanpa jadwal terperinci. Lengkapi jadwal SPK tersebut terlebih dahulu.'], 409);
+                    }
+                    $os = ((int)$otherStart->format('H')) * 60 + (int)$otherStart->format('i');
+                    $oe = ((int)$otherEnd->format('H')) * 60 + (int)$otherEnd->format('i');
+                    if ($startMinute < $oe && $os < $endMinute) {
+                        jsonOut(['ok' => false, 'error' => 'Jadwal bentrok dengan SPK ' . $otherSpk . '.'], 409);
+                    }
+                }
+            }
+        }
+        $db['orders'][$spk] = $payload;
+    }
+
     saveJsonFile($DB_FILE, $db);
+    flock($writeLock, LOCK_UN);
+    fclose($writeLock);
     jsonOut(['ok' => true]);
 }
 
