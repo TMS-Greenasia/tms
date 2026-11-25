@@ -349,12 +349,15 @@ if ($action === 'saveOrder') {
         $db['orders'][$spk] = $existing;
     } else {
         $current = $db['orders'][$spk] ?? null;
+        $isDispatching = (($payload['st'] ?? '') === 'Dispatch') && (!is_array($current) || ($current['st'] ?? '') !== 'Dispatch');
         if (($payload['st'] ?? '') === 'Dispatch' && !empty($payload['drv']) && !empty($payload['trk'])) {
             $startRaw = (string)($payload['planStart'] ?? '');
             $endRaw = (string)($payload['planEnd'] ?? '');
-            $startTime = DateTime::createFromFormat('!H:i', $startRaw);
-            $endTime = DateTime::createFromFormat('!H:i', $endRaw);
-            if (!$current && (!$startTime || !$endTime)) {
+            $validStart = preg_match('/^(?:[01]\\d|2[0-3]):[0-5]\\d$/', $startRaw) === 1;
+            $validEnd = preg_match('/^(?:[01]\\d|2[0-3]):[0-5]\\d$/', $endRaw) === 1;
+            $startTime = $validStart ? DateTime::createFromFormat('!H:i', $startRaw) : false;
+            $endTime = $validEnd ? DateTime::createFromFormat('!H:i', $endRaw) : false;
+            if ($isDispatching && (!$startTime || !$endTime)) {
                 jsonOut(['ok' => false, 'error' => 'SPK baru yang di-dispatch wajib memiliki jadwal mulai dan selesai.'], 400);
             }
             if ($startTime && $endTime) {
