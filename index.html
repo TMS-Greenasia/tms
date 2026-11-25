@@ -2258,11 +2258,29 @@
       </div>`).join('')}</div>` : ''}`;
     }
 
-    function acceptO(n) {
+    async function acceptO(n) {
       const o = gO(n);
+      if (me.role === 'driver' && o.drv !== me.id) return showToast('Bukan order Anda.');
+      const previous = { accepted: o.accepted, seen: o.seen, acceptedAt: o.acceptedAt };
       o.accepted = true; o.seen = true; o.acceptedAt = nowWib();
-      po(o); rr();
-      showToast(`Order ${n} diterima. Order sudah diterima, menunggu order selanjutnya.`);
+
+      if (useBackend && getApiToken()) {
+        try {
+          await apiReq('/api/orders/' + encodeURIComponent(o.spk), { method: 'PUT', body: JSON.stringify(o) });
+        } catch (e) {
+          o.accepted = previous.accepted;
+          o.seen = previous.seen;
+          o.acceptedAt = previous.acceptedAt;
+          lsSave(); rr();
+          return showToast('Gagal menerima order dari server: ' + ((e && e.message) || 'Coba lagi.'));
+        }
+        O[o.spk] = o;
+        lsSave();
+      } else {
+        po(o);
+      }
+      rr();
+      showToast(`Order ${n} diterima. Order sudah diterima. Menunggu order selanjutnya.`);
     }
 
     function seen(n) { const o = gO(n); o.seen = true; po(o); }
