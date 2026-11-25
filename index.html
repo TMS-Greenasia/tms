@@ -1910,6 +1910,13 @@
         </div>
       </div>
 
+      ${o.st === 'Dispatch' ? `<h3>Jadwal Operasional SPK</h3>
+      <div class="row">
+        <label>Jam mulai<input type="time" id="sched_start_${E(n)}" value="${E(o.planStart || '')}" ${canAssign ? '' : 'disabled'}></label>
+        <label>Jam selesai<input type="time" id="sched_end_${E(n)}" value="${E(o.planEnd || '')}" ${canAssign ? '' : 'disabled'}></label>
+        ${canAssign ? `<button class="b o" onclick="uSched('${E(n)}')">Simpan Jadwal</button>` : ''}
+      </div>
+      <p class="hint">Jadwal diperlukan untuk menghitung bentrok driver dan unit. SPK Dispatch lama bisa dilengkapi di sini.</p>` : ''}
       <h3>Dispatch, Penggantian Driver / No. Polisi & Uang Jalan</h3>
       <div class="row">
         <label>Driver (Melekat No. Polisi)
@@ -1950,6 +1957,36 @@
         ${i >= 0 && i < 2 ? `<input id="rs" placeholder="Alasan batal" style="max-width:200px"><button class="b r" onclick="cancelO('${E(n)}')">Batalkan order</button>` : ''}
         ${isSA() ? `<button class="b r" onclick="delO('${E(n)}')">Hapus (superadmin)</button>` : ''}
       </div>`);
+    }
+
+    async function uSched(n) {
+      if (!canAssign) return showToast('Akses ditolak untuk mengubah jadwal.');
+      const o = gO(n);
+      const start = $('sched_start_' + n).value;
+      const end = $('sched_end_' + n).value;
+      const valid = t => /^(?:[01]\\d|2[0-3]):[0-5]\\d$/.test(t || '');
+      if (!valid(start) || !valid(end)) return showToast('Isi jam mulai dan jam selesai yang valid.');
+      const startMin = (+start.slice(0, 2)) * 60 + (+start.slice(3, 5));
+      const endMin = (+end.slice(0, 2)) * 60 + (+end.slice(3, 5));
+      if (endMin <= startMin) return showToast('Jam selesai harus setelah jam mulai pada tanggal muat yang sama.');
+      const previous = { planStart: o.planStart, planEnd: o.planEnd, planHours: o.planHours };
+      o.planStart = start;
+      o.planEnd = end;
+      o.planHours = (endMin - startMin) / 60;
+      if (useBackend && getApiToken()) {
+        try {
+          await apiReq('/api/orders/' + encodeURIComponent(o.spk), { method: 'PUT', body: JSON.stringify(o) });
+        } catch (e) {
+          Object.assign(o, previous);
+          lsSave(); openO(n);
+          return showToast('Jadwal ditolak server: ' + ((e && e.message) || 'Periksa bentrok SPK.'));
+        }
+        O[o.spk] = o; lsSave();
+      } else {
+        po(o);
+      }
+      openO(n);
+      showToast('Jadwal SPK diperbarui.');
     }
 
     function uF(n, k, v) {
